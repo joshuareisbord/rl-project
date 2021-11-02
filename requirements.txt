@@ -1,0 +1,2 @@
+numpy==1.21.3
+PythonTurtle==0.3.2
