@@ -7,7 +7,7 @@ GitHub repo: https://github.com/grantjenks/free-python-games?fbclid=IwAR1YwSv61G
 from random import choice
 from turtle import *
 
-from pacman_util import vector, floor
+from utils.utils import floor, vector
 
 state = {'score': 0}
 path = Turtle(visible=False)

@@ -1,5 +1,9 @@
-import collections
+"""Utilities
 
+This code was taken from free-python-games.
+GitHub repo: https://github.com/grantjenks/free-python-games?fbclid=IwAR1YwSv61GcogElYd-ePAgDINGP7OgiVS274O4swMv2G7Z9_61LZPBDZzSA
+"""
+# pylint: disable=no-member
 
 import collections
 
