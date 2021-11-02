@@ -15,4 +15,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy other files to working directory
 COPY . .
 
-CMD ["python", "./project_name.py"]
+CMD ["python", "./PacMan/src/pacman.py"]
