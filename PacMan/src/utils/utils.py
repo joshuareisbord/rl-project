@@ -5,10 +5,7 @@ GitHub repo: https://github.com/grantjenks/free-python-games?fbclid=IwAR1YwSv61G
 """
 # pylint: disable=no-member
 
-import collections.abc
-import math
-import os
-
+import collections
 
 def floor(value, size, offset=200):
     """Floor of `value` given `size` and `offset`.
@@ -32,44 +29,6 @@ def floor(value, size, offset=200):
     -33.0
     """
     return float(((value + offset) // size) * size - offset)
-
-
-def path(filename):
-    "Return full path to `filename` in freegames module."
-    filepath = os.path.realpath(__file__)
-    dirpath = os.path.dirname(filepath)
-    fullpath = os.path.join(dirpath, filename)
-    return fullpath
-
-
-def line(a, b, x, y):
-    "Draw line from `(a, b)` to `(x, y)`."
-    import turtle
-
-    turtle.up()
-    turtle.goto(a, b)
-    turtle.down()
-    turtle.goto(x, y)
-
-
-def square(x, y, size, name):
-    """Draw square at `(x, y)` with side length `size` and fill color `name`.
-    The square is oriented so the bottom left corner is at (x, y).
-    """
-    import turtle
-
-    turtle.up()
-    turtle.goto(x, y)
-    turtle.down()
-    turtle.color(name)
-    turtle.begin_fill()
-
-    for count in range(4):
-        turtle.forward(size)
-        turtle.left(90)
-
-    turtle.end_fill()
-
 
 class vector(collections.abc.Sequence):
     """Two-dimensional vector.
