@@ -158,18 +158,19 @@ def change(x, y):
         aim.x = x
         aim.y = y
 
+def start_game():
+    setup(420, 420, 370, 0)
+    hideturtle()
+    tracer(False)
+    writer.goto(160, 160)
+    writer.color('white')
+    writer.write(state['score'])
+    listen()
+    onkey(lambda: change(5, 0), 'Right')
+    onkey(lambda: change(-5, 0), 'Left')
+    onkey(lambda: change(0, 5), 'Up')
+    onkey(lambda: change(0, -5), 'Down')
+    world()
+    move()
+    done()
 
-setup(420, 420, 370, 0)
-hideturtle()
-tracer(False)
-writer.goto(160, 160)
-writer.color('white')
-writer.write(state['score'])
-listen()
-onkey(lambda: change(5, 0), 'Right')
-onkey(lambda: change(-5, 0), 'Left')
-onkey(lambda: change(0, 5), 'Up')
-onkey(lambda: change(0, -5), 'Down')
-world()
-move()
-done()
