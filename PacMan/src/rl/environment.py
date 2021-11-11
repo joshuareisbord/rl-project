@@ -22,8 +22,8 @@ class Environment:
         # self.n = self.board.shape[0]
         # self.m = self.board.shape[1]
         self.states = []
-        self.generate_states()
-        # self.bfunction(self.state.copy())
+        # self.generate_states()
+        self.bfunction(self.state.copy())
         print(self.states)
         self.actions = None
         self.rewards = None
@@ -48,7 +48,7 @@ class Environment:
                 non_walls.append(elem)
 
         for i in range(2**len(non_walls)):
-            pellet_s = [bin(i)[2:].zfill(len(non_walls))]
+            pellet_s = list(bin(i)[2:].zfill(len(non_walls)))
                
             for wall in walls:
                 pellet_s.insert(wall, 0)
@@ -58,18 +58,20 @@ class Environment:
                             print([p,g,pellet_s])
                             self.states.append([p,g,pellet_s])
 
-    def bfunction(self, state):
-        
-        if state in self.states:
-            return
-        if state not in self.states:
-            self.states.append(state)
-        state_obj = State(state)
-        self.bfunction(state_obj.action_set[0].get_next_state(state))
-        self.bfunction(state_obj.action_set[1].get_next_state(state))
-        self.bfunction(state_obj.action_set[2].get_next_state(state))
-        self.bfunction(state_obj.action_set[3].get_next_state(state))
-        
+    def bfunction(self, current_state, states, visited_states):
+        if not states:
+            return 
+        # print(state)
+        # if state in self.states:
+        #     return
+        # if state not in self.states:
+        #     self.states.append(state)
+        # state_obj = State(state)
+        # self.bfunction(state_obj.action_set[0].get_next_state(state))
+        # self.bfunction(state_obj.action_set[1].get_next_state(state))
+        # self.bfunction(state_obj.action_set[2].get_next_state(state))
+        # self.bfunction(state_obj.action_set[3].get_next_state(state))
+        # return
 
     def validate_state(self, state):
         """
