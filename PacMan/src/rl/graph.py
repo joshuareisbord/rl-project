@@ -1,14 +1,13 @@
 
-class Board:
+class Graph:
     def __init__(self, board_arr):
-        
         self.actions = [-4, 1, 4, -1] # North, East, South, West
         self.board_arr = board_arr
         self.edges = self.initialize_edge_table()
         self.east_bounds = [4, 8, 12, 16, 20]
         self.west_bounds = [-1, 3, 7, 11, 15]
         self.create_edge_list()
-        self.root = self.create_graph()
+        self.root, self.nodes = self.create_graph()
 
     def initialize_edge_table(self):
         edges = []
@@ -32,11 +31,11 @@ class Board:
                 node_list.append(None)
             else:
                 if index == 0:
-                    node = Node(True, False, False)
+                    node = Node(index)
                 elif index == 19:
-                    node = Node(False, True, True)
+                    node = Node(index)
                 else:
-                    node = Node(False, False, True)
+                    node = Node(index)
                 node_list.append(node)
                 
         return node_list
@@ -57,7 +56,7 @@ class Board:
                 if edge[3] != None: # West
                     west_node = node_list[edge[3]]
                     node.west = west_node
-        return node_list[0]
+        return node_list[0], node_list
 
 
     def get_all_valid_actions(self, position):
@@ -87,15 +86,21 @@ class Board:
 
 class Node:
 
-    def __init__(self, pac_man, ghost, pill):
-        self.north = None
-        self.east = None
-        self.south = None
-        self.west = None
-        self.pac_man = pac_man
-        self.ghost = ghost
-        self.pill = pill
-
+    def __init__(self, position, parent=None, north=None, south=None, east=None, west=None):
+        self.north = north
+        self.east = east
+        self.south = south
+        self.west = west
+        self.position = position
+        self.parent = parent
+        self.g = 0
+        self.h = 0
+        self.f = 0
+    
+    def __eq__(self, other):
+        if isinstance(other, Node):
+            return self.position == other.position
+        return False
 
 if __name__ == '__main__':
     board = [
@@ -105,4 +110,4 @@ if __name__ == '__main__':
             1, 0, 0, 1,
             1, 1, 1, 1
         ]
-    b = Board(board)
+    b = Graph(board)
