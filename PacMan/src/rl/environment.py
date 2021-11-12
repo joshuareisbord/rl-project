@@ -127,9 +127,26 @@ class Environment:
 
                 open_list.append(node)
                 
-
-
-                
+    def get_direction_of_a_star(self, path):
+        """
+        Purpose:
+            Gets the direction of the next step in the given path.
+            The first position in the path is the current position.
+            Thus we are only concerned with the first to indexes of path.
+        Args:
+            path - the optimal path to some position from a starting position
+        Returns:
+            The direction of the next step to follow the path.
+        """
+        starting_node_index = path[0]
+        next_node_index = path[1]
+        starting_node = self.graph.nodes[starting_node_index]
+        next_node = self.graph.nodes[next_node_index]
+        if starting_node.north == next_node: return "North"
+        if starting_node.east == next_node: return "East"
+        if starting_node.south == next_node: return "South"
+        if starting_node.west == next_node: return "West"
+         
         # def generate_states(self):
     #     """
         
@@ -173,6 +190,8 @@ if __name__ == '__main__':
 
     path = e.a_star(0, 19)
     print(path)
+    direction = e.get_direction_of_a_star(path)
+    print(direction)
 
 
     
