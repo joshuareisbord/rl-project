@@ -1,32 +1,40 @@
 
+
 class Graph:
-    def __init__(self, board_arr):
-        self.actions = [-4, 1, 4, -1] # North, East, South, West
-        self.board_arr = board_arr
-        self.edges = self.initialize_edge_table()
-        self.east_bounds = [4, 8, 12, 16, 20]
-        self.west_bounds = [-1, 3, 7, 11, 15]
-        self.create_edge_list()
+    """
+    
+    """
+    
+    def __init__(self, env):
+        """
+        
+        """
+        self.env = env
+        self.graph_edges = self.create_edge_list()
         self.root, self.nodes = self.create_graph()
 
-    def initialize_edge_table(self):
-        edges = []
-        for _ in self.board_arr:
-            edges.append([])
-        return edges
-
     def create_edge_list(self):
-        for position in range(len(self.board_arr)):
-            if self.board_arr[position] == 0: continue
-            n, e, s, w = self.get_all_valid_actions(position)
-            self.edges[position].append(n[1])
-            self.edges[position].append(e[1])
-            self.edges[position].append(s[1])
-            self.edges[position].append(w[1])
+        graph_edges = []
+        for position in range(len(self.env.board)):
+            node_edges = []
+            if self.env.board[position] != 0:
+                for index, action in enumerate(self.env.actions):
+                    next_position = position + action
+                    valid_position = self.env.verify_position(next_position, index)
+                    if valid_position:
+                        node_edges.append(next_position)
+                    else:
+                        node_edges.append(None)
+
+            graph_edges.append(node_edges)
+        return graph_edges
             
     def create_nodes(self):
+        """
+        
+        """
         node_list = []
-        for index, edge in enumerate(self.edges):
+        for index, edge in enumerate(self.graph_edges):
             if edge == []:
                 node_list.append(None)
             else:
@@ -41,8 +49,11 @@ class Graph:
         return node_list
     
     def create_graph(self):
+        """
+        
+        """
         node_list = self.create_nodes()
-        for node, edge in zip(node_list, self.edges):
+        for node, edge in zip(node_list, self.graph_edges):
             if node != None:
                 if edge[0] != None: # North
                     north_node = node_list[edge[0]]
@@ -57,32 +68,6 @@ class Graph:
                     west_node = node_list[edge[3]]
                     node.west = west_node
         return node_list[0], node_list
-
-
-    def get_all_valid_actions(self, position):
-        n = (False, None)
-        e = (False, None)
-        s = (False, None)
-        w = (False, None)
-        for index, action in enumerate(self.actions):
-            next_position = position + action
-            if index == 0:
-                if next_position >= 0:
-                    if self.board_arr[next_position] != 0:
-                        n = (True, next_position) 
-            if index == 1:
-                if next_position not in self.east_bounds:
-                    if self.board_arr[next_position] != 0:
-                        e = (True, next_position)
-            if index == 2:
-                if next_position < 20:
-                    if self.board_arr[next_position] != 0:
-                        s = (True, next_position)
-            if index == 3:
-                if next_position not in self.west_bounds:
-                    if self.board_arr[next_position] != 0:
-                        w = (True, next_position)
-        return n, e, s, w
 
 class Node:
 
@@ -101,13 +86,3 @@ class Node:
         if isinstance(other, Node):
             return self.position == other.position
         return False
-
-if __name__ == '__main__':
-    board = [
-            1, 1, 1, 1,
-            1, 0, 0, 1,
-            1, 0, 1, 1,
-            1, 0, 0, 1,
-            1, 1, 1, 1
-        ]
-    b = Graph(board)
