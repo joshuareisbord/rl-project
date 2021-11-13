@@ -1,3 +1,4 @@
+
 class States:
     """
     Generates all possible states possible for the representation.
@@ -9,15 +10,33 @@ class States:
         :return: None.
         """
         self.__states = {}
-        self.generate_states()
-        
-    def __str__(self):
-        """
-        Returns a string representation of the states.
+        self.__generate_states()
 
-        :return: A string representation of the states.
+    def states(self):
         """
-        return str(self.__states.values())
+        Returns all the states.
+
+        :return: A list of all the states.
+        """
+        return list(self.__states.values())
+
+    def keys(self):
+        """
+        Returns the keys of the states.
+
+        :return: A list of the keys of the states.
+        """
+        return self.__states.keys()
+
+    def get_state(self, state_hash):
+        """
+        Gets a state from the list of states.
+
+        :param state_hash: The hash of the state to get.
+
+        :return: The state.
+        """
+        return self.__states[state_hash]
 
     def add_state(self, state):
         """
@@ -44,25 +63,15 @@ class States:
         except KeyError:
             return False
 
-    def get_state(self, state_hash):
+    def __str__(self):
         """
-        Gets a state from the list of states.
+        Returns a string representation of the states.
 
-        :param state_hash: The hash of the state to get.
-
-        :return: The state.
+        :return: A string representation of the states.
         """
-        return self.__states[hash]
+        return str(self.__states.values())
 
-    def get_all_states(self):
-        """
-        Returns all the states.
-
-        :return: A list of all the states.
-        """
-        return list(self.__states.values())
-
-    def generate_states(self):
+    def __generate_states(self):
         """
         Generates all possible states.
 
