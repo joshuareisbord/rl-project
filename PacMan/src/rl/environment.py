@@ -142,10 +142,10 @@ class Environment:
         next_node_index = path[1]
         starting_node = self.graph.nodes[starting_node_index]
         next_node = self.graph.nodes[next_node_index]
-        if starting_node.north == next_node: return "North"
-        if starting_node.east == next_node: return "East"
-        if starting_node.south == next_node: return "South"
-        if starting_node.west == next_node: return "West"
+        if starting_node.north == next_node: return 0
+        if starting_node.east == next_node: return 1
+        if starting_node.south == next_node: return 2
+        if starting_node.west == next_node: return 3
 
     def get_reward(self, position, action):
         """
@@ -169,7 +169,76 @@ class Environment:
                 else:
                     return -0.5
         return -0.5
+    
+    def get_next_state(self, pac_man_position, action):
+        """
+        Returns state hash to look up the states value in the q table.
+        """
+        node = self.graph.nodes[pac_man_position]
+        pac_man_next_position = pac_man_position + self.actions[action]
+        next_node = self.graph.nodes[pac_man_next_position]
+        state = []
         
+        if next_node == None:
+            return state, pac_man_position
+        
+        for index, _ in enumerate(self.actions):
+            valid = self.verify_position(pac_man_next_position, index)
+            if valid:
+                state.append(1)
+            else:
+                state.append(0)
+        state.append(self.get_dir_closest_pellet(pac_man_next_position))
+        # Change here if more ghosts are added.
+        state.append(self.get_dir_ghost(pac_man_next_position))
+        state = State(state[0], state[1], state[2], state[3], state[4], state[5])
+        state_hash = state.__hash__()
+        return state_hash, pac_man_next_position
+        
+        
+        
+    def get_dir_closest_pellet(self, pac_man_position):
+        """
+        Purpose:
+            Function gets the closest pellet to pac_man and 
+            calculates its relative direction to pac_man
+        Args:
+            pac_man_position - the index of pac_man's position in the graph 
+        Returns: 
+            The direction of the pellet (0-3)
+        """
+
+        closest = [None, None, np.inf]
+        for end in range(len(self.board)):
+            node = self.graph.nodes[end]
+            if node is not None:
+                if node.pellet:
+                    # a star
+                    path = self.a_star(pac_man_position, end)
+                    if (len(path) < closest[1]):
+                        direction = self.get_direction_of_a_star(path)
+                        closest = [node, direction, len(path)]
+                
+        return direction
+
+    def get_dir_ghost(self, pac_man_position):
+        """
+        Purpose:
+            Function finds the position of the ghost and 
+            computes its relative position to pac_man
+        Args:
+            pac_man_position - the index of pac_man's position in the graph 
+        Returns: 
+            The direction of the ghost(0-3)
+        """
+
+        for end in range(len(self.board)):
+            node = self.graph.nodes[end]
+            if node is not None:
+                if node.ghost:
+                    path = self.a_star(pac_man_position, end)
+                    direction = self.get_direction_of_a_star(path)
+                    return direction
 
 if __name__ == '__main__':
     length = 5
