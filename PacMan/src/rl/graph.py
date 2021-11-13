@@ -36,15 +36,17 @@ class Graph:
         node_list = []
         for index, edge in enumerate(self.graph_edges):
             if edge == []:
-                node_list.append(None)
+                node = None
             else:
                 if index == 0:
                     node = Node(index)
+                    node.pellet = False
                 elif index == 19:
                     node = Node(index)
+                    node.ghost = True
                 else:
                     node = Node(index)
-                node_list.append(node)
+            node_list.append(node)
                 
         return node_list
     
@@ -81,6 +83,8 @@ class Node:
         self.g = 0
         self.h = 0
         self.f = 0
+        self.pellet = True
+        self.ghost = False
     
     def __eq__(self, other):
         if isinstance(other, Node):
