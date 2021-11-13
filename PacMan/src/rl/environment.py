@@ -1,8 +1,9 @@
 import numpy as np
 
-from state import State
+from state import State, States
 from graph import Graph
 from graph import Node
+
 
 class Environment:
     """
@@ -109,7 +110,6 @@ class Environment:
                     new_node = Node(new_node_position, current_node)
                     children.append(new_node)
 
-            
             for node in children:
                 for closed_n in closed_list:
                     if node == closed_n:
@@ -146,32 +146,30 @@ class Environment:
         if starting_node.east == next_node: return "East"
         if starting_node.south == next_node: return "South"
         if starting_node.west == next_node: return "West"
-         
-        # def generate_states(self):
-    #     """
+
+    def get_reward(self, position, action):
+        """
+        Purpose:
+            Function gets the reward after taking an action.
+        Args:
+            position - the index 
+        Action is an index
+        """
+
+        node = self.env.nodes[position]
+        valid_action = self.verify_position(position, action)
+        if valid_action:
+            next_position = position + self.env.actions[action]
+            next_node = self.env.nodes[next_position]
+            if next_node.ghost:
+                return -10
+            else:
+                if next_node.pellet:
+                    return 1
+                else:
+                    return -0.5
+        return -0.5
         
-    #     """
-    #     # states = []
-    #     walls = []
-    #     non_walls = []
-    #     for elem in self.board:
-    #         if elem == 0:
-    #             walls.append(elem)
-    #         else:
-    #             non_walls.append(elem)
-
-    #     for i in range(2**len(non_walls)):
-    #         pellet_s = list(bin(i)[2:].zfill(len(non_walls)))
-               
-    #         for wall in walls:
-    #             pellet_s.insert(wall, 0)
-    #             for p in range(len(self.board)):
-    #                 for g in range(len(self.board)):
-    #                     if not (p in walls or g in walls):
-    #                         print([p,g,pellet_s])
-    #                         self.states.append([p,g,pellet_s])
-
-    
 
 if __name__ == '__main__':
     length = 5
@@ -181,10 +179,11 @@ if __name__ == '__main__':
             1, 0, 0, 1,
             1, 0, 1, 1,
             1, 0, 0, 1,
-            1, 1, 1, 1]
+            1, 1, 1, 1
+            ]
     
-    actions = [-4, 1, 4, -1]
-    bounds = [0, [4, 8, 12, 16, 20], 20, [-1, 3, 7, 11, 15]]
+    actions = [-4, 1, 4, -1] # [ north, east, south, west] (index modifiers for the board)
+    bounds = [0, [4, 8, 12, 16, 20], 20, [-1, 3, 7, 11, 15]] # [ north, [east], south, [west] ]
 
     e = Environment(length, width, board, bounds, actions)
 
@@ -192,6 +191,10 @@ if __name__ == '__main__':
     print(path)
     direction = e.get_direction_of_a_star(path)
     print(direction)
+    s = States()
+    print(s)
+
+
 
 
     
