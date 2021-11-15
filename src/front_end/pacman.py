@@ -174,3 +174,5 @@ def start_game():
     move()
     done()
 
+start_game()
+

@@ -2,7 +2,7 @@ import numpy as np
 
 from state import State, States
 from qtable import QTable
-from util.rand_argmax import rand_argmax
+from back_end.util import rand_argmax
 
 class SARSA:
     """

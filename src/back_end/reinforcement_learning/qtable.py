@@ -7,7 +7,7 @@ class QTable:
     """
     This is the Q-Table for the PacMan game.
     """
-    def __init__(self):
+    def __init__(self, filename="q_table.json"):
         """
         Initializes the Q-Table.
 
@@ -15,15 +15,16 @@ class QTable:
         """
         self.__table = {}
         self.__load_q_table()
+        self.__filename = filename
 
-    def __load_q_table(self, filename="q_table.json"):
+    def __load_q_table(self):
         """
         Loads the Q-Table from file. If the file does not exist, Q-Table is created.
 
         :param filename: The filename of the Q-Table.
         """
         try:
-            file_dir = f"{os.getcwd()}/{'PacMan/training/'}{filename}"
+            file_dir = f"{os.getcwd()}/{'PacMan/training/'}{self.__filename}"
             with open(file_dir, "r") as file:
                 self.__table = json.load(file)
         except FileNotFoundError:
@@ -84,7 +85,7 @@ class QTable:
         except KeyError:
             raise KeyError("The state does not exist in the Q-Table!")
 
-    def save(self, filename="q_table.json"):
+    def save(self):
         """
         Save the Q-Table to a file.
 
@@ -95,7 +96,7 @@ class QTable:
         :raises FileNotFoundError: If the file does not exist.
         """
         try:
-            file_dir = f"{os.getcwd()}/{'PacMan/training/'}{filename}"
+            file_dir = f"{os.getcwd()}/{'PacMan/training/'}{self.__filename}"
             print(f"Saving Q-Table to {file_dir}")
             with open(file_dir, "w") as file:
                 json.dump(self.__table, file, indent=4)
