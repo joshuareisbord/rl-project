@@ -1,13 +1,31 @@
-from a_star_node import AStarNode
-
 class AStar:
+    """
+    AStar class
+    """
 
     def __init__(self, environment):
+        """
+        Purpose:
+            Default constructor. Set environment and position mapping attributes.
+        Args:
+            self - class instance.
+            environment - instance of the Environment class.
+        """
         self.env = environment
         self.position_mapping = self.get_position_coordinates(self.env.length, self.env.width)
         
     @staticmethod
     def get_position_coordinates(length, width):
+        """
+        Purpose:
+            Gets a 2D representation of the board. Is used to calculate Manhattan distance in
+            a star method.
+        Args:
+            length - the length of the board.
+            width - the width of the board.
+        Returns:
+            A 2D array of coordinates.
+        """
         coordinates = []
         for x in range(length):
             for y in range(width):
@@ -16,16 +34,29 @@ class AStar:
     
     def a_star(self, start, end):
         """
-        Performes A Star Algorithm, on an environment's graph.
-        Returns shortest dist to path
+        Purpose:
+            Performes A Star Algorithm given a starting and ending position.
+            An AStarNode node is created for the start and end position. It then checks
+            which direction from the start is the closest to the end. It then creates a 
+            new AStarNode at that position and makes the previous position its parent.
+            This process is repeated until the new AStarNode created is equal to the 
+            end node. Then we loop backwards through the nodes parent attribute to get 
+            the path from the start to the end.
+        Args:
+            self - class instance.
+            start - the starting position in the 1D board representation.
+            end - the ending position in the 1D board representation.
+        Returns:
+            A 1D array of the shortest path from the start to the end position. Each index
+            of the path represents a position on the 1D board representation.
         """
         start_node = AStarNode(start)
         start_node.g = start_node.h = start_node.f = 0
         end_node = AStarNode(end)
         end_node.g = end_node.h = end_node.f = 0
 
-        end_node_x = self.env.position_mapping[end_node.position][0]
-        end_node_y = self.env.position_mapping[end_node.position][1]
+        end_node_x = self.position_mapping[end_node.position][0]
+        end_node_y = self.position_mapping[end_node.position][1]
 
         open_list = []
         closed_list = []
@@ -68,8 +99,8 @@ class AStar:
                         continue
                 
                 node.g = current_node.g + 1
-                node_x = self.env.position_mapping[node.position][0]
-                node_y = self.env.position_mapping[node.position][1]
+                node_x = self.position_mapping[node.position][0]
+                node_y = self.position_mapping[node.position][1]
                 node.h += abs(node_x - end_node_x) + abs(node_y - end_node_y)
                 node.f = node.g + node.h
 
@@ -86,15 +117,39 @@ class AStar:
             The first position in the path is the current position.
             Thus we are only concerned with the first to indexes of path.
         Args:
+            self - class instance.
             path - the optimal path to some position from a starting position
         Returns:
             The direction of the next step to follow the path.
         """
         starting_node_index = path[0]
         next_node_index = path[1]
-        starting_node = self.env.graph.nodes[starting_node_index]
-        next_node = self.env.graph.nodes[next_node_index]
+        starting_node = self.env.nodes[starting_node_index]
+        next_node = self.env.nodes[next_node_index]
         if starting_node.north == next_node: return 0
         if starting_node.east == next_node: return 1
         if starting_node.south == next_node: return 2
         if starting_node.west == next_node: return 3
+
+class AStarNode:
+    """
+    A* Node class.
+    """    
+
+    def __init__(self, position, parent=None):
+        """
+        Default constructor for A* Node class.
+        """
+        self.position = position
+        self.parent = parent
+        self.g = 0
+        self.h = 0
+        self.f = 0
+        
+    def __eq__(self, other):
+        """ 
+        Evaluates AStarNode objects based on their position.
+        """
+        if isinstance(other, AStarNode):
+            return self.position == other.position
+        return False

@@ -3,13 +3,48 @@ class Graph:
     Graph class.
     """
     
-    def __init__(self, environment):
+    def __init__(self, length, width, board, actions, bounds):
         """
         Default constructor for Graph class.
         """
-        self.env = environment
+        self.board = board
+        self.actions = actions
+        self.length = length
+        self.width = width
+        self.north_bound = bounds[0]
+        self.east_bound = bounds[1]
+        self.south_bound = bounds[2]
+        self.west_bound = bounds[3]
         self.graph_edges = self.create_edge_list()
         self.nodes = self.create_graph()
+
+    def verify_position(self, position, action):
+        """
+        Purpose:
+            Verifies if the provided position can be reached after taking an action.
+        Args:
+            position - the new position. The index of self.board
+            action - the action that was taken.
+        Returns:
+            A boolean. True if the position is valid. False otherwise.
+        """
+        if action == 0:     
+            if position >= self.north_bounds:       # Checks North bound.
+                if self.board[position] != 0:       # Checks if position is in a wall.
+                    return True
+        elif action == 1:
+            if position not in self.east_bounds:    # Checks East bound. 
+                if self.board[position] != 0:       # Checks if position is in a wall. 
+                    return True
+        elif action == 2:
+            if position < self.south_bounds:        # Checks South bound.
+                if self.board[position] != 0:       # Checks if position is in a wall.
+                    return True
+        elif action == 3:
+            if position not in self.west_bounds:    # Checks West bound.
+                if self.board[position] != 0:       # Checks if position is in a wall.
+                    return True
+        return False
 
     def create_edge_list(self):
         """
@@ -24,15 +59,15 @@ class Graph:
         """
         graph_edges = []
         # Loop through each position in the 1D board representation.
-        for position in range(len(self.env.board)):
+        for position in range(len(self.board)):
             node_edges = []
             # Check if the position is not a wall.
-            if self.env.board[position] != 0:
+            if self.board[position] != 0:
                 # Loop through each action.
-                for index, action in enumerate(self.env.actions):
+                for index, action in enumerate(self.actions):
                     next_position = position + action
                     # Verify if the next position is a valid position.
-                    valid_position = self.env.verify_position(next_position, index)
+                    valid_position = self.verify_position(next_position, index)
                     if valid_position:
                         node_edges.append(next_position)
                     else:
