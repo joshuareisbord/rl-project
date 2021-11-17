@@ -77,15 +77,15 @@ class States:
 
         :return: None.
         """
-        for n in range(2):
-            for s in range(2):
-                for e in range(2):
-                    for w in range(2):
-                        for p_dir in range(4):
-                            for g_dir in range(4):
+        for n in range(2): # can go north: 1, cant go north: 0
+            for s in range(2): # can go south: 1, cant go south: 0
+                for e in range(2): # can go east: 1, cant go east: 0
+                    for w in range(2): # can go west: 1, cant go west: 0
+                        for p_dir in range(4): # player direction: 0 = north, 1 = east, 2 = south, 3 = west
+                            for g_dir in range(4): # ghost direction: 0 = north, 1 = east, 2 = south, 3 = west
                                 state = State(n, s, e, w, p_dir, g_dir)
-                                self.__states[hash(state)] = state
-                                self.add_state(State(n, s, e, w, p_dir, g_dir))
+                                self.__states[hash(state)] = state # hash value which is key for the state
+                                self.add_state(State(n, e, s, w, p_dir, g_dir))
         return
 
 
