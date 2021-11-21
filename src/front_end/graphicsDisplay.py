@@ -153,12 +153,12 @@ class InfoPane:
 
 
 class PacmanGraphics:
-    def __init__(self, zoom=1.0, frameTime=0.0, capture=False):
+    def __init__(self, zoom = 1, frameTime=0.0, capture=False):
         self.have_window = 0
         self.currentGhostImages = {}
         self.pacmanImage = None
+        self.gridSize = DEFAULT_GRID_SIZE * zoom # zoom scales the display
         self.zoom = zoom
-        self.gridSize = DEFAULT_GRID_SIZE * zoom
         self.capture = capture
         self.frameTime = frameTime
 

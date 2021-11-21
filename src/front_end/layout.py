@@ -35,31 +35,9 @@ class Layout:
         self.processLayoutText(layoutText)
         self.layoutText = layoutText
         self.totalFood = len(self.food.asList())
-        # self.initializeVisibilityMatrix()
 
     def getNumGhosts(self):
         return self.numGhosts
-
-    def initializeVisibilityMatrix(self):
-        global VISIBILITY_MATRIX_CACHE
-        if reduce(str.__add__, self.layoutText) not in VISIBILITY_MATRIX_CACHE:
-            from game import Directions
-            vecs = [(-0.5,0), (0.5,0),(0,-0.5),(0,0.5)]
-            dirs = [Directions.NORTH, Directions.SOUTH, Directions.WEST, Directions.EAST]
-            vis = Grid(self.width, self.height, {Directions.NORTH:set(), Directions.SOUTH:set(), Directions.EAST:set(), Directions.WEST:set(), Directions.STOP:set()})
-            for x in range(self.width):
-                for y in range(self.height):
-                    if self.walls[x][y] == False:
-                        for vec, direction in zip(vecs, dirs):
-                            dx, dy = vec
-                            nextx, nexty = x + dx, y + dy
-                            while (nextx + nexty) != int(nextx) + int(nexty) or not self.walls[int(nextx)][int(nexty)] :
-                                vis[x][y][direction].add((nextx, nexty))
-                                nextx, nexty = x + dx, y + dy
-            self.visibility = vis
-            VISIBILITY_MATRIX_CACHE[reduce(str.__add__, self.layoutText)] = vis
-        else:
-            self.visibility = VISIBILITY_MATRIX_CACHE[reduce(str.__add__, self.layoutText)]
 
     def isWall(self, pos):
         x, col = pos
@@ -128,22 +106,11 @@ class Layout:
         elif layoutChar in  ['1', '2', '3', '4']:
             self.agentPositions.append( (int(layoutChar), (x,y)))
             self.numGhosts += 1
-def getLayout(name, back = 2):
-    if name.endswith('.lay'):
-        layout = tryToLoad('layouts/' + name)
-        if layout == None: layout = tryToLoad(name)
-    else:
-        layout = tryToLoad('layouts/' + name + '.lay')
-        if layout == None: layout = tryToLoad(name + '.lay')
-    if layout == None and back >= 0:
-        curdir = os.path.abspath('.')
-        os.chdir('..')
-        layout = getLayout(name, back -1)
-        os.chdir(curdir)
-    return layout
 
-def tryToLoad(fullname):
-    if(not os.path.exists(fullname)): return None
-    f = open(fullname)
-    try: return Layout([line.strip() for line in f])
-    finally: f.close()
+def getLayout(name):
+    try: 
+        f = open('layouts/' + name + '.lay')
+        try: return Layout([line.strip() for line in f])
+        finally: f.close()
+    except IOError:
+        raise Exception('The layout ' + name + ' cannot be found')
