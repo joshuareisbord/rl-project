@@ -503,14 +503,13 @@ class Game:
     The Game manages the control flow, soliciting actions from agents.
     """
 
-    def __init__( self, agents, display, rules, startingIndex=0, muteAgents=False):
+    def __init__( self, agents, display, rules, startingIndex=0):
         self.agentCrashed = False
         self.agents = agents
         self.display = display
         self.rules = rules
         self.startingIndex = startingIndex
         self.gameOver = False
-        self.muteAgents = muteAgents
         self.moveHistory = []
         self.totalAgentTimes = [0 for agent in agents]
         self.totalAgentTimeWarnings = [0 for agent in agents]
@@ -530,25 +529,6 @@ class Game:
         self.gameOver = True
         self.agentCrashed = True
         self.rules.agentCrash(self, agentIndex)
-
-    OLD_STDOUT = None
-    OLD_STDERR = None
-
-    def mute(self, agentIndex):
-        if not self.muteAgents: return
-        global OLD_STDOUT, OLD_STDERR
-        import cStringIO
-        OLD_STDOUT = sys.stdout
-        OLD_STDERR = sys.stderr
-        sys.stdout = self.agentOutput[agentIndex]
-        sys.stderr = self.agentOutput[agentIndex]
-
-    def unmute(self):
-        if not self.muteAgents: return
-        global OLD_STDOUT, OLD_STDERR
-        # Revert stdout/stderr to originals
-        sys.stdout = OLD_STDOUT
-        sys.stderr = OLD_STDERR
 
 
     def run( self ):
@@ -570,9 +550,7 @@ class Game:
 
             # Solicit an action
             action = None
-            self.mute(agentIndex)
             action = agent.getAction(observation)
-            self.unmute()
 
             # Execute the action
             self.moveHistory.append( (agentIndex, action) )
@@ -589,14 +567,5 @@ class Game:
             if agentIndex == numAgents + 1: self.numMoves += 1
             # Next agent
             agentIndex = ( agentIndex + 1 ) % numAgents
-
-        # inform a learning agent of the game result
-        for agentIndex, agent in enumerate(self.agents):
-            if "final" in dir( agent ) :
-                try:
-                    self.mute(agentIndex)
-                    agent.final( self.state )
-                    self.unmute()
-                except Exception as data:
-                    raise
+            
         self.display.finish()
