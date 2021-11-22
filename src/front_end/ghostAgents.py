@@ -12,12 +12,10 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-from game import Agent
-from game import Actions
-from game import Directions
+from front_end.game import Agent, Actions, Directions
+from front_end.util import manhattanDistance
 import random
-from util import manhattanDistance
-import util
+from front_end import util
 
 class GhostAgent( Agent ):
     def __init__( self, index ):

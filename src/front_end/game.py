@@ -20,7 +20,7 @@
 # John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
 
-from util import *
+from front_end.util import *
 import time, os
 import traceback
 import sys
@@ -543,7 +543,7 @@ class Game:
 
         self.display.initialize(self.state.data)
         self.numMoves = 0
-        pacman_agent.get_state_representation(self.state)
+        # pacman_agent.get_state_representation(self.state)
         # choose action, from S using qtable
         while not self.gameOver:
             # Take action, observe R, S'

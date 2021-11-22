@@ -11,9 +11,9 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 import numpy as np
-from ..back_end.util.a_star import AStar
-from game import Agent
-from game import Directions
+from back_end.util.a_star import AStar
+from front_end.game import Agent, Directions
+# from game import Directions
 import random
 
 class SarsaAgent(Agent):

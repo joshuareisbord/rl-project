@@ -39,13 +39,10 @@ code to run a game.  This file is divided into three sections:
 To play your first game, type 'python pacman.py' from the command line.
 The keys are 'a', 's', 'd', and 'w' to move (or arrow keys).  Have fun!
 """
-from game import GameStateData
-from game import Game
-from game import Directions
-from game import Actions
-from util import nearestPoint
-from util import manhattanDistance
-import util, layout
+from front_end.game import GameStateData, Game, Directions, Actions
+from front_end.util import nearestPoint, manhattanDistance
+import front_end.util
+import front_end.layout as layout
 import sys, types, time, random, os
 
 ###################################################
@@ -503,7 +500,7 @@ def readCommand( argv ):
 
     # Choose a display format
     
-    import graphicsDisplay
+    from front_end import graphicsDisplay
     args['display'] = graphicsDisplay.PacmanGraphics(frameTime = options.frameTime)
     args['timeout'] = 30
 
@@ -513,7 +510,7 @@ def loadGhost(ghostType):
     """
     Returns a ghost agent class of the requested type.
     """
-    from ghostAgents import RandomGhost, DirectionalGhost
+    from front_end.ghostAgents import RandomGhost, DirectionalGhost
     if ghostType == 'RandomGhost':
         return RandomGhost
     elif ghostType == 'DirectionalGhost':
@@ -523,8 +520,8 @@ def loadPacman(pacmanType):
     """
     Returns a pacman agent class.
     """
-    from keyboardAgents import KeyboardAgent
-    from sarsaAgents import SarsaAgent
+    from front_end.keyboardAgents import KeyboardAgent
+    from front_end.sarsaAgents import SarsaAgent
 
     if pacmanType == 'KeyboardAgent':
         return KeyboardAgent()

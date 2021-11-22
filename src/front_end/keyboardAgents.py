@@ -12,8 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-from game import Agent
-from game import Directions
+from front_end.game import Agent, Directions
 import random
 
 class KeyboardAgent(Agent):

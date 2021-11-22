@@ -12,8 +12,8 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-from util import manhattanDistance
-from game import Grid
+from front_end.util import manhattanDistance
+from front_end.game import Grid
 import os
 import random
 
@@ -109,7 +109,7 @@ class Layout:
 
 def getLayout(name):
     try: 
-        f = open('layouts/' + name + '.lay')
+        f = open('src/front_end/layouts/' + name + '.lay')
         try: return Layout([line.strip() for line in f])
         finally: f.close()
     except IOError:

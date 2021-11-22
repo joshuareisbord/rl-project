@@ -14,7 +14,7 @@ class AStar:
             environment - instance of the Environment class.
         """
         self.env = environment
-        self.position_mapping = self.get_position_coordinates(self.env.length, self.env.width)
+        # self.position_mapping = self.get_position_coordinates(self.env.length, self.env.width)
         
     @staticmethod
     def get_position_coordinates(length, width):
@@ -88,8 +88,9 @@ class AStar:
             children = []
             actions = state.getLegalPacmanActions()
             for index, action in enumerate(actions):
+                if action == "Stop": continue
                 action = self.get_action_coordinates(action)
-                new_node_position = np.array(current_node.position) + action
+                new_node_position = tuple(np.array(current_node.position) + action)
                 new_node = AStarNode(new_node_position, current_node)
                 children.append(new_node)
 
@@ -134,11 +135,11 @@ class AStar:
     @staticmethod
     def get_action_coordinates(action):
         if action == "North":
-            return np.array([-1, 0])
+            return np.array([0, -1])
         elif action == "East":
-            return np.array([0, 1])
-        elif action == "South":
             return np.array([1, 0])
+        elif action == "South":
+            return np.array([0, 1])
         elif action == "West":
             return np.array([-1, 0])
         elif action == "Stop":
@@ -167,5 +168,5 @@ class AStarNode:
         Evaluates AStarNode objects based on their position.
         """
         if isinstance(other, AStarNode):
-            return self.position == other.position
+            return np.all(self.position == other.position)
         return False

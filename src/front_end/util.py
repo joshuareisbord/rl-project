@@ -15,10 +15,10 @@
 import sys
 import inspect
 import heapq, random
-try:
-    from StringIO import StringIO ## for Python 2
-except ImportError:
-    from io import StringIO
+# try:
+#     from StringIO import StringIO ## for Python 2
+# except ImportError:
+from io import StringIO
 
 
 class FixedRandom:
