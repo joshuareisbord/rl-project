@@ -10,8 +10,8 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
-
+import numpy as np
+from ..back_end.util.a_star import AStar
 from game import Agent
 from game import Directions
 import random
@@ -36,6 +36,7 @@ class SarsaAgent(Agent):
         self.lastMove = Directions.STOP
         self.index = index
         self.keys = []
+        self.a_star = AStar(None)
 
     def getAction(self, state):
         """
@@ -56,3 +57,39 @@ class SarsaAgent(Agent):
         if move == None:
             move = Directions.STOP
         return move
+    
+    def get_state_representation(self, state):
+        legal_actions = state.getLegalPacmanActions()
+        pacman_pos = state.getPacmanPosition()
+
+        ghost_positions = state.getGhostPositions()
+        food_positions = state.getFood().asList()
+        north, east, south, west = self.get_pacman_position_binary_rep(legal_actions)
+        cpd = self.get_closest_position_direction(pacman_pos, food_positions, state)
+        cgd = self.get_closest_position_direction(pacman_pos, ghost_positions, state)
+        state = (north, east, south, west, cpd, cgd)
+        print(state)
+        return state
+
+    def get_pacman_position_binary_rep(self, legal_actions):
+        north = east = south = west = 0
+        for action in legal_actions:
+            if action == "North": north += 1
+            elif action == "East": east += 1
+            elif action == "South": south += 1
+            elif action == "West": west += 1
+            else: continue
+        return north, east, south, west
+
+    def get_closest_position_direction(self, pacman_position, positions, state):
+        closest = np.inf
+        closest_path = None
+        for pos in positions:
+            path = self.a_star.a_star(pacman_position, pos, state)
+            path_len = len(path)
+            if path_len <= closest:
+                closest = path_len
+                closest_path = path
+        closest_direction = self.a_star.get_direction_of_a_star(closest_path)
+        return closest_direction
+

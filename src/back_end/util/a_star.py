@@ -1,3 +1,5 @@
+import numpy as np
+
 class AStar:
     """
     AStar class
@@ -32,7 +34,7 @@ class AStar:
                 coordinates.append((x, y))
         return coordinates
     
-    def a_star(self, start, end):
+    def a_star(self, start, end, state):
         """
         Purpose:
             Performes A Star Algorithm given a starting and ending position.
@@ -55,8 +57,8 @@ class AStar:
         end_node = AStarNode(end)
         end_node.g = end_node.h = end_node.f = 0
 
-        end_node_x = self.position_mapping[end_node.position][0]
-        end_node_y = self.position_mapping[end_node.position][1]
+        end_node_x = end_node.position[0]
+        end_node_y = end_node.position[1]
 
         open_list = []
         closed_list = []
@@ -84,14 +86,12 @@ class AStar:
                 return path[::-1]
 
             children = []
-            for index, action in enumerate(self.env.actions):
-
-                new_node_position = current_node.position + action
-                valid_new_position = self.env.verify_position(new_node_position, index)
-                
-                if valid_new_position:
-                    new_node = AStarNode(new_node_position, current_node)
-                    children.append(new_node)
+            actions = state.getLegalPacmanActions()
+            for index, action in enumerate(actions):
+                action = self.get_action_coordinates(action)
+                new_node_position = np.array(current_node.position) + action
+                new_node = AStarNode(new_node_position, current_node)
+                children.append(new_node)
 
             for node in children:
                 for closed_n in closed_list:
@@ -99,8 +99,8 @@ class AStar:
                         continue
                 
                 node.g = current_node.g + 1
-                node_x = self.position_mapping[node.position][0]
-                node_y = self.position_mapping[node.position][1]
+                node_x = node.position[0]
+                node_y = node.position[1]
                 node.h += abs(node_x - end_node_x) + abs(node_y - end_node_y)
                 node.f = node.g + node.h
 
@@ -130,6 +130,22 @@ class AStar:
         if starting_node.east == next_node: return 1
         if starting_node.south == next_node: return 2
         if starting_node.west == next_node: return 3
+
+    @staticmethod
+    def get_action_coordinates(action):
+        if action == "North":
+            return np.array([-1, 0])
+        elif action == "East":
+            return np.array([0, 1])
+        elif action == "South":
+            return np.array([1, 0])
+        elif action == "West":
+            return np.array([-1, 0])
+        elif action == "Stop":
+            return np.array([0, 0])
+        else:
+            print("Not a valid action.")
+            exit(1)
 
 class AStarNode:
     """

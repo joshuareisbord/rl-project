@@ -535,37 +535,62 @@ class Game:
         """
         Main control loop for game play.
         """
+        
+        pacman_agent = self.agents[0]
+        ghost_agents = self.agents[1:]
+        
+        # Get Q table
+
         self.display.initialize(self.state.data)
         self.numMoves = 0
-
-        agentIndex = self.startingIndex
-        numAgents = len( self.agents )
-
+        pacman_agent.get_state_representation(self.state)
+        # choose action, from S using qtable
         while not self.gameOver:
+            # Take action, observe R, S'
+
+            # choose action' from S'
+            # update qtable
+            # s = s' a = a'
             # Fetch the next agent
-            agent = self.agents[agentIndex]
-            move_time = 0
-            skip_action = False
+            
+            
             observation = self.state.deepCopy()
 
-            # Solicit an action
-            action = None
-            action = agent.getAction(observation)
+            # get an action
+            action = pacman_agent.getAction(observation)
 
-            # Execute the action
-            self.moveHistory.append( (agentIndex, action) )
-            self.state = self.state.generateSuccessor( agentIndex, action )
+            # Take the action
+            self.moveHistory.append( (0, action) )
+            self.state = self.state.generateSuccessor( 0, action )
 
             # Change the display
             self.display.update( self.state.data )
-            ###idx = agentIndex - agentIndex % 2 + 1
-            ###self.display.update( self.state.makeObservation(idx).data )
-
+            
             # Allow for game specific conditions (winning, losing, etc.)
             self.rules.process(self.state, self)
-            # Track progress
-            if agentIndex == numAgents + 1: self.numMoves += 1
-            # Next agent
-            agentIndex = ( agentIndex + 1 ) % numAgents
+            self.numMoves += 1
+
+            self.run_ghost(ghost_agents)
             
         self.display.finish()
+
+    def run_ghost(self, ghost_agents):
+        agent_index = 1
+        for agent in ghost_agents:
+            observation = self.state.deepCopy()
+
+            # Get an action
+            action = agent.getAction(observation)
+
+            # Execute the action
+            self.moveHistory.append( (agent_index, action) )
+            self.state = self.state.generateSuccessor( agent_index, action )
+
+            # Change the display
+            self.display.update( self.state.data )
+            
+            # Allow for game specific conditions (winning, losing, etc.)
+            self.rules.process(self.state, self)
+
+            self.numMoves += 1
+            agent_index += 1
