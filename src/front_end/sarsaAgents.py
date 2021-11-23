@@ -16,6 +16,7 @@ from front_end.game import Agent, Directions
 # from game import Directions
 import random
 import copy
+from back_end.util.sorts import sort_coordinates
 
 class SarsaAgent(Agent):
     """
@@ -65,11 +66,12 @@ class SarsaAgent(Agent):
 
         ghost_positions = state.getGhostPositions()
         food_positions = state.getFood().asList()
+        _, sorted_food_positions = sort_coordinates(food_positions, pacman_pos)
+        closest_food_position = [sorted_food_positions[0]]
         north, east, south, west = self.get_pacman_position_binary_rep(legal_actions)
-        cpd = self.get_closest_position_direction(pacman_pos, food_positions, state)
+        cpd = self.get_closest_position_direction(pacman_pos, closest_food_position, state)
         cgd = self.get_closest_position_direction(pacman_pos, ghost_positions, state)
         state = (north, east, south, west, cpd, cgd)
-        print(state)
         return state
 
     def get_pacman_position_binary_rep(self, legal_actions):
