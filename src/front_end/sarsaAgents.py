@@ -15,6 +15,7 @@ from back_end.util.a_star import AStar
 from front_end.game import Agent, Directions
 # from game import Directions
 import random
+import copy
 
 class SarsaAgent(Agent):
     """
@@ -85,11 +86,12 @@ class SarsaAgent(Agent):
         closest = np.inf
         closest_path = None
         for pos in positions:
-            path = self.a_star.a_star(pacman_position, pos, state)
+            state_copy = copy.deepcopy(state)
+            path = self.a_star.a_star(pacman_position, pos, state_copy)
             path_len = len(path)
             if path_len <= closest:
                 closest = path_len
                 closest_path = path
-        closest_direction = self.a_star.get_direction_of_a_star(closest_path)
+        closest_direction = self.a_star.get_direction_of_a_star(closest_path, state)
         return closest_direction
 

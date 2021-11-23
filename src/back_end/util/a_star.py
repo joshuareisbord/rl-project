@@ -68,11 +68,15 @@ class AStar:
         while open_list != []:
 
             current_node = open_list[0]
+            
             current_index = 0
             for index, item in enumerate(open_list):
                 if item.f < current_node.f:
                     current_node = item
                     current_index = index
+                    # print(current_node.position)
+                    # Updates position
+                    state.data.agentStates[0].configuration.pos = current_node.position
             
             open_list.pop(current_index)
             closed_list.append(current_node)
@@ -111,7 +115,7 @@ class AStar:
 
                 open_list.append(node)
                 
-    def get_direction_of_a_star(self, path):
+    def get_direction_of_a_star(self, path, state):
         """
         Purpose:
             Gets the direction of the next step in the given path.
@@ -125,21 +129,25 @@ class AStar:
         """
         starting_node_index = path[0]
         next_node_index = path[1]
-        starting_node = self.env.nodes[starting_node_index]
-        next_node = self.env.nodes[next_node_index]
-        if starting_node.north == next_node: return 0
-        if starting_node.east == next_node: return 1
-        if starting_node.south == next_node: return 2
-        if starting_node.west == next_node: return 3
+        actions = state.getLegalPacmanActions()
+        for action in actions:
+            if action == "Stop": continue
+            action_cord = self.get_action_coordinates(action)
+            new_node_position = tuple(np.array(starting_node_index) + action_cord)
+            if new_node_position == next_node_index:
+                if action == 'North': return 0
+                if action == 'East': return 1
+                if action == 'South': return 2
+                if action == 'West': return 3
 
     @staticmethod
     def get_action_coordinates(action):
         if action == "North":
-            return np.array([0, -1])
+            return np.array([0, 1])
         elif action == "East":
             return np.array([1, 0])
         elif action == "South":
-            return np.array([0, 1])
+            return np.array([0, -1])
         elif action == "West":
             return np.array([-1, 0])
         elif action == "Stop":

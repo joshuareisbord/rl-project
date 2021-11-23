@@ -543,7 +543,7 @@ class Game:
 
         self.display.initialize(self.state.data)
         self.numMoves = 0
-        # pacman_agent.get_state_representation(self.state)
+        pacman_agent.get_state_representation(self.state.deepCopy())
         # choose action, from S using qtable
         while not self.gameOver:
             # Take action, observe R, S'
