@@ -1,124 +1,151 @@
-
+import numpy
 import json
-import os
-from state import States
+
+class State:
+    """
+    Individual State object.
+    """
+    
+    def __init__(self, north, east, south, west, closest_food_dir, closest_ghost_dir):
+        """
+        Initializes the state.
+
+        :param north: The north direction.
+        :param east: The east direction.
+        :param south: The south direction.
+        :param west: The west direction.
+        :param closest_food_dir: The direction to the closest pellet.
+        :param closest_ghost_dir: The direction to the closest ghost.
+        """
+        self.north = north
+        self.east = east
+        self.south = south
+        self.west = west
+        self.closest_food_dir = closest_food_dir
+        self.closest_ghost_dir = closest_ghost_dir
+
+    def as_tuple(self):
+        """
+        Function returns a tuple representation of the state.
+        :return: A tuple representation of the state.
+        """
+        return (self.north, self.east, self.south, self.west, self.closest_food_dir, self.closest_ghost_dir)
+
+    def __eq__(self, other):
+        """
+        Function returns True if the states are equal.
+        :param other: The other state.
+        :return: True if the states are equal.
+        """
+        return \
+        isinstance(other, State) \
+        and self.north == other.north \
+        and self.east == other.east \
+        and self.south == other.south \
+        and self.west == other.west \
+        and self.closest_food_dir == other.closest_food_dir \
+        and self.closest_ghost_dir == other.closest_ghost_dir \
+
+    def __repr__(self):
+        """
+        Function returns a string representation of the state.
+        :return: A string representation of the state.
+        """
+        return str((self.north, self.east, self.south, self.west, self.closest_food_dir, self.closest_ghost_dir))
+
+    def __hash__(self):
+        """
+        Function returns a hash of the state.
+        :return: A hash of the state.
+        """
+        return hash((self.north, self.east, self.south, self.west, self.closest_food_dir, self.closest_ghost_dir))
 
 class QTable:
-    """
-    This is the Q-Table for the PacMan game.
-    """
-    def __init__(self, filename="q_table.json"):
+
+    def __init__(self): # TODO: take actions from Directions class as list as an argument
+        self.table = {}
+        self.actions = ['north', 'east', 'south', 'west'] # TODO: change to a list of actions from Directions class!
+        self.init_table()
+
+    def init_table(self):
         """
-        Initializes the Q-Table.
-
-        :param filename: The filename of the Q-Table.
+        Generates all possible states.
+        :return: None.
         """
-        self.__table = {}
-        self.__load_q_table()
-        self.__filename = filename
+        for n in range(2): # can go north: 1, cant go north: 0
+            for e in range(2): # can go south: 1, cant go south: 0
+                for s in range(2): # can go east: 1, cant go east: 0
+                    for w in range(2): # can go west: 1, cant go west: 0
+                        for p_dir in range(4): # player direction: 0 = north, 1 = east, 2 = south, 3 = west
+                            for g_dir in range(4): # ghost direction: 0 = north, 1 = east, 2 = south, 3 = west
+                                state = State(n, e, s, w, p_dir, g_dir)
+                                self.table[hash(state)] = [0]*len(self.get_actions()) # create an entry in the Q-table for the state
 
-    def __load_q_table(self):
+    def get_table(self):
         """
-        Loads the Q-Table from file. If the file does not exist, Q-Table is created.
-
-        :param filename: The filename of the Q-Table.
+        Gets the whole Q-table.
+        :return: Q-table dictionary
         """
-        try:
-            file_dir = f"{os.getcwd()}/{'PacMan/training/'}{self.__filename}"
-            with open(file_dir, "r") as file:
-                self.__table = json.load(file)
-        except FileNotFoundError:
-            print(f"Q-Table file at {file_dir} not found! Generating new Q-Table")
-            states = States()
-            for state in states.keys():
-                self.__table[state] = [0, 0, 0, 0] # [ north, east, south, west ] #q-values which will be updated
+        return self.table
 
-    def get_state_q_values(self, state):
+    def get_actions(self):
         """
-        Returns the Q-Values of a state.
-
-        :param state: The state.
-
-        :return: The Q-Values of the state.
+        Get all actions.
+        :return: list of all actions
         """
-        try:
-            return self.__table[hash(state)]
-        except KeyError:
-            raise KeyError("The state does not exist in the Q-Table!")
+        return self.actions
 
-    def get_q_value(self, state, action):
+    def get_action_value(self, state: State, action):
         """
-        Gets the Q-Value of a state and action.
-
-        :param state: The state.
-        :param action: The action: north, south, east or west.
-
-        :return: The Q-Value of the state and action.
+        Gets Q-value of a specific state given an action
         """
+        idx = self.get_actions().index(action)
+        return self.table[hash(state)][idx]
 
-        actions = self.get_state_q_values(state)
-
-        if action.lower() in ["north", "east", "south", "west"]:
-            if action == "north":
-                return actions[0]
-            elif action == "east":
-                return actions[1]
-            elif action == "south":
-                return actions[2]
-            elif action == "west":
-                return actions[3]
-        else:
-            raise ValueError("The action is not valid!")
-
-    def set_q_value(self, state, action, value):
+    def get_state_values(self, state: State):
         """
-        Sets the Q-Value of a state and action.
-
-        :param state: The state.
-        :param action: The action.
-
-        :return: True if the Q-Value was set, False otherwise.
+        Get Q-values for the given state object.
+        :param state: current state (instance of State class)
+        :return: Q-values for the current state
         """
-        try:
-            self.__table[hash(state)][action] = value
-            return True
-        except KeyError:
-            raise KeyError("The state does not exist in the Q-Table!")
+        return self.table[hash(state)]
 
-    def save(self):
+    def update_state(self, state: State, action, value):
         """
-        Save the Q-Table to a file.
-
-        :param filename: The filename of the Q-Table.
-
-        :return: True if the Q-Table was saved
-
-        :raises FileNotFoundError: If the file does not exist.
+        Updates the state action pair to the given value.
         """
-        try:
-            file_dir = f"{os.getcwd()}/{'PacMan/training/'}{self.__filename}"
-            print(f"Saving Q-Table to {file_dir}")
-            with open(file_dir, "w") as file:
-                json.dump(self.__table, file, indent=4)
-        except FileNotFoundError:
-            exception = FileNotFoundError("The file could not be found.")
-            raise exception
+        idx = self.get_actions().index(action)
+        self.table[hash(state)][idx] = value
+
+    def save(self, filename='q_table'):
+        """
+        Saves the Q-Table to a file.
+        :param filename: name of the file
+        """
+        dir = "q_tables/" + filename + ".json" # TODO: change path
+        with open(dir, 'w') as f:
+            json.dump(self.table, f, indent=4)
+
+    def load(self, filename='q_table'):
+        """
+        Loads the Q-Table from a file.
+        :param filename: name of the file
+        """
+        dir = "q_tables/" + filename + ".json" # TODO: change path
+        with open(dir, 'r') as f:
+            raw_table = json.load(f)
+            tmp = {}
+            for key in raw_table:
+                print(key, raw_table[key])
+                tmp[int(key)] = raw_table[key] # make sure key is an integer
+            self.table = tmp
 
     def __str__(self):
-        """
-        String representation of the Q-Table.
-
-        :return: A string representation of the Q-Table.
-        """
         string = ""
-        for state in self.__table.keys():
-            string += f"{str(state)}: {str(self.__table[state])}\n"
+        for key in self.table.keys():
+            string += str(key) + " : " + str(self.table[key]) + "\n"
         return string
-
-    def __len__(self):
-        """
-        Total number of states in the Q-Table.
-
-        :return: The total number of states in the Q-Table.
-        """
-        return len(self.__table)
+        
+if __name__ == "__main__":
+    q = QTable()
+    print(q)
