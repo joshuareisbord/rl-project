@@ -12,7 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 import numpy as np
 from back_end.util.a_star import AStar
-from front_end.game import Agent, Directions
+from front_end.game.game import Agent, Directions
 # from game import Directions
 import random
 import copy
