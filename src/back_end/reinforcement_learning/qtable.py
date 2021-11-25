@@ -1,6 +1,6 @@
 import numpy
 import json
-
+import os
 class State:
     """
     Individual State object.
@@ -17,6 +17,20 @@ class State:
         :param closest_food_dir: The direction to the closest pellet.
         :param closest_ghost_dir: The direction to the closest ghost.
         """
+
+        if north not in list(range(2)):
+            raise ValueError(f"Invalid north direction {north}.")
+        if east not in list(range(2)):
+            raise ValueError(f"Invalid east direction {east}.")
+        if south not in list(range(2)):
+            raise ValueError(f"Invalid south direction {south}.")
+        if west not in list(range(2)):
+            raise ValueError(f"Invalid west direction {west}.")
+        if closest_food_dir not in list(range(4)):
+            raise ValueError(f"Invalid closest pellet direction {closest_food_dir}.")
+        if closest_ghost_dir not in list(range(4)):
+            raise ValueError(f"Invalid closest ghost direction {closest_ghost_dir}.")
+
         self.north = north
         self.east = east
         self.south = south
@@ -64,8 +78,9 @@ class QTable:
 
     def __init__(self): # TODO: take actions from Directions class as list as an argument
         self.table = {}
-        self.actions = ['north', 'east', 'south', 'west'] # TODO: change to a list of actions from Directions class!
+        self.actions = ['North', 'East', 'South', 'West'] # TODO: change to a list of actions from Directions class!
         self.init_table()
+        self.save()
 
     def init_table(self):
         """
@@ -108,12 +123,14 @@ class QTable:
         :param state: current state (instance of State class)
         :return: Q-values for the current state
         """
+        print(state, hash(state))
         return self.table[hash(state)]
 
     def update_state(self, state: State, action, value):
         """
         Updates the state action pair to the given value.
         """
+        print(state, action, value)
         idx = self.get_actions().index(action)
         self.table[hash(state)][idx] = value
 
@@ -122,7 +139,8 @@ class QTable:
         Saves the Q-Table to a file.
         :param filename: name of the file
         """
-        dir = "q_tables/" + filename + ".json" # TODO: change path
+        
+        dir = "src/back_end/training/" + filename + ".json"
         with open(dir, 'w') as f:
             json.dump(self.table, f, indent=4)
 
@@ -131,12 +149,11 @@ class QTable:
         Loads the Q-Table from a file.
         :param filename: name of the file
         """
-        dir = "q_tables/" + filename + ".json" # TODO: change path
+        dir = "src/back_end/training/" + filename + ".json" 
         with open(dir, 'r') as f:
             raw_table = json.load(f)
             tmp = {}
             for key in raw_table:
-                print(key, raw_table[key])
                 tmp[int(key)] = raw_table[key] # make sure key is an integer
             self.table = tmp
 

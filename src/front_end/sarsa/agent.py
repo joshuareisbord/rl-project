@@ -17,6 +17,7 @@ from front_end.game.game import Agent, Directions
 import random
 import copy
 from back_end.util.sorts import sort_coordinates
+from back_end.reinforcement_learning.qtable import State
 
 class SarsaAgent(Agent):
     """
@@ -71,16 +72,19 @@ class SarsaAgent(Agent):
         north, east, south, west = self.get_pacman_position_binary_rep(legal_actions)
         cpd = self.get_closest_position_direction(pacman_pos, closest_food_position, state)
         cgd = self.get_closest_position_direction(pacman_pos, ghost_positions, state)
-        state = (north, east, south, west, cpd, cgd)
+        state = State(north, east, south, west, cpd, cgd)
         return state
 
     def get_pacman_position_binary_rep(self, legal_actions):
-        north = east = south = west = 0
+        north = 0
+        east = 0
+        south = 0
+        west = 0
         for action in legal_actions:
-            if action == "North": north += 1
-            elif action == "East": east += 1
-            elif action == "South": south += 1
-            elif action == "West": west += 1
+            if action == "North": north = 1
+            elif action == "East": east = 1
+            elif action == "South": south = 1
+            elif action == "West": west = 1
             else: continue
         return north, east, south, west
 
@@ -88,12 +92,15 @@ class SarsaAgent(Agent):
         closest = np.inf
         closest_path = None
         for pos in positions:
+            if pacman_position == pos:
+                return 1
             state_copy = copy.deepcopy(state)
             path = self.a_star.a_star(pacman_position, pos, state_copy)
             path_len = len(path)
             if path_len <= closest:
                 closest = path_len
                 closest_path = path
+        
         closest_direction = self.a_star.get_direction_of_a_star(closest_path, state)
         return closest_direction
 
