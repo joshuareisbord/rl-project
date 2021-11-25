@@ -97,3 +97,5 @@ class SarsaAgent(Agent):
         closest_direction = self.a_star.get_direction_of_a_star(closest_path, state)
         return closest_direction
 
+    def get_reward(self, GameStateData):
+        return GameStateData.scoreChange
