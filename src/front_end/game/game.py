@@ -345,7 +345,11 @@ class Actions:
             dx, dy = vec
             next_y = y_int + dy
             next_x = x_int + dx
-            if not walls[next_x][next_y]: possible.append(dir)
+            try:
+                if not walls[next_x][next_y]: 
+                    possible.append(dir)
+            except IndexError:
+                pass
 
         return possible
 
