@@ -1,5 +1,6 @@
 import numpy as np
-
+import time
+from queue import PriorityQueue
 class AStar:
     """
     AStar class
@@ -34,87 +35,130 @@ class AStar:
                 coordinates.append((x, y))
         return coordinates
     
+    # def a_star(self, start, end, state):
+    #     """
+    #     Purpose:
+    #         Performes A Star Algorithm given a starting and ending position.
+    #         An AStarNode node is created for the start and end position. It then checks
+    #         which direction from the start is the closest to the end. It then creates a 
+    #         new AStarNode at that position and makes the previous position its parent.
+    #         This process is repeated until the new AStarNode created is equal to the 
+    #         end node. Then we loop backwards through the nodes parent attribute to get 
+    #         the path from the start to the end.
+    #     Args:
+    #         self - class instance.
+    #         start - the starting position in the 1D board representation.
+    #         end - the ending position in the 1D board representation.
+    #     Returns:
+    #         A 1D array of the shortest path from the start to the end position. Each index
+    #         of the path represents a position on the 1D board representation.
+    #     """
+    #     start = (5, 4)
+    #     end = (1.0, 2.0)
+    #     start_node = AStarNode(start)
+    #     start_node.g = start_node.h = start_node.f = 0
+    #     end_node = AStarNode(end)
+    #     end_node.g = end_node.h = end_node.f = 0
+
+    #     end_node_x = end_node.position[0]
+    #     end_node_y = end_node.position[1]
+    #     print(start)
+    #     print(end)
+    #     open_list = []
+    #     closed_list = []
+
+    #     open_list.append(start_node)
+    #     t0 = time.time()
+    #     while open_list != []:
+
+    #         current_node = open_list[0]
+            
+    #         current_index = 0
+    #         for index, item in enumerate(open_list):
+    #             if item.f < current_node.f:
+    #                 current_node = item
+    #                 current_index = index
+                    
+    #                 # Updates position
+    #                 state.data.agentStates[0].configuration.pos = current_node.position
+            
+    #         open_list.pop(current_index)
+    #         closed_list.append(current_node)
+
+    #         if current_node == end_node:
+    #             path = []
+    #             current = current_node
+    #             while current is not None:
+    #                 path.append(current.position)
+    #                 current = current.parent
+    #             t1 = time.time()
+    #             print(t1-t0)
+    #             return path[::-1]
+
+    #         children = []
+    #         actions = state.getLegalPacmanActions()
+    #         if 'Stop' in actions:
+    #             actions.remove('Stop')
+    #         for index, action in enumerate(actions):
+    #             action = self.get_action_coordinates(action)
+    #             new_node_position = tuple(np.array(current_node.position) + action)
+    #             new_node = AStarNode(new_node_position, current_node)
+    #             children.append(new_node)
+
+    #         for node in children:
+    #             for closed_n in closed_list:
+    #                 if node == closed_n:
+    #                     continue
+    #             print("okay")
+    #             node.g = current_node.g + 1
+    #             print("broken")
+    #             node_x = node.position[0]
+    #             node_y = node.position[1]
+    #             node.h += abs(node_x - end_node_x) + abs(node_y - end_node_y)
+    #             node.f = node.g + node.h
+
+    #             for open_n in open_list:
+    #                 if node == open_n and node.g > open_n.g:
+    #                     continue
+
+    #             open_list.append(node)
+
     def a_star(self, start, end, state):
-        """
-        Purpose:
-            Performes A Star Algorithm given a starting and ending position.
-            An AStarNode node is created for the start and end position. It then checks
-            which direction from the start is the closest to the end. It then creates a 
-            new AStarNode at that position and makes the previous position its parent.
-            This process is repeated until the new AStarNode created is equal to the 
-            end node. Then we loop backwards through the nodes parent attribute to get 
-            the path from the start to the end.
-        Args:
-            self - class instance.
-            start - the starting position in the 1D board representation.
-            end - the ending position in the 1D board representation.
-        Returns:
-            A 1D array of the shortest path from the start to the end position. Each index
-            of the path represents a position on the 1D board representation.
-        """
-        start_node = AStarNode(start)
-        start_node.g = start_node.h = start_node.f = 0
-        end_node = AStarNode(end)
-        end_node.g = end_node.h = end_node.f = 0
+        start = (5, 4)
+        end = (1.0, 2.0)
+        frontier = PriorityQueue()
+        frontier.put(start, 0)
+        came_from = {}
+        cost_so_far = {}
+        came_from[start] = None
+        cost_so_far[start] = 0
 
-        end_node_x = end_node.position[0]
-        end_node_y = end_node.position[1]
+        while not frontier.empty():
+            current = frontier.get()
 
-        open_list = []
-        closed_list = []
+            if current == end:
+                break
 
-        open_list.append(start_node)
-
-        while open_list != []:
-
-            current_node = open_list[0]
-            
-            current_index = 0
-            for index, item in enumerate(open_list):
-                if item.f < current_node.f:
-                    current_node = item
-                    current_index = index
-                    # print(current_node.position)
-                    # Updates position
-                    state.data.agentStates[0].configuration.pos = current_node.position
-            
-            open_list.pop(current_index)
-            closed_list.append(current_node)
-
-            if current_node == end_node:
-                path = []
-                current = current_node
-                while current is not None:
-                    path.append(current.position)
-                    current = current.parent
-                return path[::-1]
-
-            children = []
             actions = state.getLegalPacmanActions()
+            if 'Stop' in actions:
+                actions.remove('Stop')
             for index, action in enumerate(actions):
-                if action == "Stop": continue
+                new_cost = cost_so_far[current] + 1
                 action = self.get_action_coordinates(action)
-                new_node_position = tuple(np.array(current_node.position) + action)
-                new_node = AStarNode(new_node_position, current_node)
-                children.append(new_node)
+                new_man = tuple(np.array(current) + action)
+                if new_man not in cost_so_far or new_cost < cost_so_far[new_man]:
+                    cost_so_far[new_man] = new_cost
+                    priority = new_cost + self.heuristic(new_man, end)
+                    frontier.put(new_man, priority)
+                    came_from[new_man] = current
+                    state.data.agentStates[0].configuration.pos = new_man
+        return list(came_from.keys())
 
-            for node in children:
-                for closed_n in closed_list:
-                    if node == closed_n:
-                        continue
-                
-                node.g = current_node.g + 1
-                node_x = node.position[0]
-                node_y = node.position[1]
-                node.h += abs(node_x - end_node_x) + abs(node_y - end_node_y)
-                node.f = node.g + node.h
 
-                for open_n in open_list:
-                    if node == open_n and node.g > open_n.g:
-                        continue
-
-                open_list.append(node)
-                
+    def heuristic(self,a, b):
+        (x1, y1) = a
+        (x2, y2) = b
+        return abs(x1 - x2) + abs(y1 - y2)
     def get_direction_of_a_star(self, path, state):
         """
         Purpose:
@@ -132,8 +176,9 @@ class AStar:
         starting_node_index = path[0]
         next_node_index = path[1]
         actions = state.getLegalPacmanActions()
+        if 'Stop' in actions:
+            actions.remove('Stop') 
         for action in actions:
-            if action == "Stop": continue
             action_cord = self.get_action_coordinates(action)
             new_node_position = tuple(np.array(starting_node_index) + action_cord)
             if new_node_position == next_node_index:

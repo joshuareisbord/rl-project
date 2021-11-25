@@ -13,7 +13,7 @@ class RunGame:
         self.game = game
         self.run()
 
-    def run(self, episodes=10, alpha=0.5, gamma=0.9, epsilon=0.1, filename='q_table'):
+    def run(self, episodes=100, alpha=0.5, gamma=9, epsilon=0.1, filename='q_table'):
         """
         Main control loop for game play.
         """
@@ -72,7 +72,7 @@ class RunGame:
 
             q_table.save(filename)   
             
-        start_game.display.finish()
+        self.game.display.finish()
 
     def run_ghost(self, ghost_agents):
         agent_index = 1

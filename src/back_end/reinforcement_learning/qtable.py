@@ -122,14 +122,12 @@ class QTable:
         :param state: current state (instance of State class)
         :return: Q-values for the current state
         """
-        print(state, hash(state))
         return self.table[hash(state)]
 
     def update_state(self, state: State, action, value):
         """
         Updates the state action pair to the given value.
         """
-        print(state, action, value)
         idx = self.get_actions().index(action)
         self.table[hash(state)][idx] = value
 
