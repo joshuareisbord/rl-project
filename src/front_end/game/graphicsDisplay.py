@@ -12,9 +12,9 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-from front_end.graphicsUtils import *
+from front_end.game.graphicsUtils import *
 import math, time
-from front_end.game import Directions
+from front_end.game.game import Directions
 
 ###########################
 #  GRAPHICS DISPLAY CODE  #

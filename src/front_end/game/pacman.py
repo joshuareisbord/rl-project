@@ -39,10 +39,10 @@ code to run a game.  This file is divided into three sections:
 To play your first game, type 'python pacman.py' from the command line.
 The keys are 'a', 's', 'd', and 'w' to move (or arrow keys).  Have fun!
 """
-from front_end.game import GameStateData, Game, Directions, Actions
-from front_end.util import nearestPoint, manhattanDistance
-import front_end.util
-import front_end.layout as layout
+from front_end.game.game import GameStateData, Game, Directions, Actions
+from front_end.game.util import nearestPoint, manhattanDistance
+import front_end.game.util
+import front_end.game.layout as layout
 import sys, types, time, random, os
 
 ###################################################
@@ -500,7 +500,7 @@ def readCommand( argv ):
 
     # Choose a display format
     
-    from front_end import graphicsDisplay
+    from front_end.game import graphicsDisplay
     args['display'] = graphicsDisplay.PacmanGraphics(frameTime = options.frameTime)
     args['timeout'] = 30
 
@@ -510,7 +510,7 @@ def loadGhost(ghostType):
     """
     Returns a ghost agent class of the requested type.
     """
-    from front_end.ghostAgents import RandomGhost, DirectionalGhost
+    from front_end.game.ghostAgents import RandomGhost, DirectionalGhost
     if ghostType == 'RandomGhost':
         return RandomGhost
     elif ghostType == 'DirectionalGhost':
@@ -520,8 +520,8 @@ def loadPacman(pacmanType):
     """
     Returns a pacman agent class.
     """
-    from front_end.keyboardAgents import KeyboardAgent
-    from front_end.sarsaAgents import SarsaAgent
+    from front_end.game.keyboardAgents import KeyboardAgent
+    from front_end.sarsa.agent import SarsaAgent
 
     if pacmanType == 'KeyboardAgent':
         return KeyboardAgent()
@@ -539,11 +539,19 @@ def runGames( layout, pacman, ghosts, display, timeout=30 ):
     rules.quiet = False
     game = rules.newGame(layout, pacman, ghosts, gameDisplay)
     game.run()
-
+    
     scores = [game.state.getScore() for game in games]
     wins = [game.state.isWin() for game in games]
-    winRate = wins.count(True)/ float(len(wins))
-    print('Average Score:', sum(scores) / float(len(scores)))
+
+    if float(len(wins)) == 0.0:
+        winRate = wins.count(True)
+    else:
+        winRate = wins.count(True)/ float(len(wins))
+    if float(len(scores)) == 0.0:
+        avgScore = sum(scores)
+    else:
+        avgScore = sum(scores) / float(len(scores))
+    print('Average Score:', avgScore)
     print('Scores:       ', ', '.join([str(score) for score in scores]))
     print('Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate))
     print('Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins]))
