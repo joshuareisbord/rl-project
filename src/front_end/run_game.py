@@ -13,105 +13,66 @@ class RunGame:
         self.game = game
         self.run()
 
-    def run(self, episodes=2, alpha=0.5, gamma=0.9, epsilon=0.1, filename='q_table'):
+    def run(self, episodes=10, alpha=0.5, gamma=0.9, epsilon=0.1, filename='q_table'):
         """
         Main control loop for game play.
         """
-        # clean_game = copy.deepcopy(self.game)
-
-        # for _ in range(episodes):
-        #     self.game = copy.deepcopy(clean_game)
-        #     self.game.display.initialize(self.game.state.data)
-        #     self.game.numMoves = 0
-
-        #     agentIndex = self.game.startingIndex
-        #     numAgents = len( self.game.agents )
-        
-        #     while not self.game.gameOver:
-        #         # Fetch the next agent
-        #         agent = self.game.agents[agentIndex]
-        #         move_time = 0
-        #         skip_action = False
-        #         observation = self.game.state.deepCopy()
-
-        #         # Solicit an action
-        #         action = None
-        #         # self.game.mute(agentIndex)
-        #         action = agent.getAction(observation)
-        #         # self.game.unmute()
-
-        #         # Execute the action
-        #         self.game.moveHistory.append( (agentIndex, action) )
-        #         self.game.state = self.game.state.generateSuccessor( agentIndex, action )
-
-        #         # Change the display
-        #         self.game.display.update( self.game.state.data )
-        #         ###idx = agentIndex - agentIndex % 2 + 1
-        #         ###self.game.display.update( self.game.state.makeObservation(idx).data )
-
-        #         # Allow for game specific conditions (winning, losing, etc.)
-        #         self.game.rules.process(self.game.state, self.game)
-        #         # Track progress
-        #         if agentIndex == numAgents + 1: self.game.numMoves += 1
-        #         # Next agent
-        #         agentIndex = ( agentIndex + 1 ) % numAgents
-    
-        
-        
-        
-        
+        q_table = QTable()
         start_game = copy.deepcopy(self.game)
         for episode in range(episodes):
             self.game = copy.deepcopy(start_game)
+            self.game.display.initialize(self.game.state.data)
             pacman_agent = self.game.agents[0]
             ghost_agents = self.game.agents[1:]
-            q_table = QTable()
-            q_table.load(filename)
-            self.game.display.initialize(self.game.state.data)
-            self.game.numMoves = 0
             
-            state = pacman_agent.get_state_representation(self.game.state.deepCopy())
+            q_table.load(filename)
+            
+            self.game.numMoves = 0
 
+            state = pacman_agent.get_state_representation(self.game.state.deepCopy())
+            
             legal_actions = self.game.state.getLegalPacmanActions()
             # Hash state
             action = epsilonGreedy(q_table, state, legal_actions, epsilon)
             # choose action, from S using qtable
 
-            try:
-                while not self.game.gameOver:
+            
+            while not self.game.gameOver:
+                if self.game.gameOver:
+                    continue
+                # Take action, observe R, S'
+                self.game.moveHistory.append( (0, action) )
+                self.game.state = self.game.state.generateSuccessor( 0, action )
+                reward = pacman_agent.get_reward(self.game.state.data)
+                state_prime = pacman_agent.get_state_representation(self.game.state.deepCopy())
+                # choose action' from S'
+                legal_actions = self.game.state.getLegalPacmanActions()
+                action_prime = epsilonGreedy(q_table, state_prime, legal_actions, epsilon)
+                
+                new_q_s_a = q_table.get_action_value(state, action) + alpha * (reward + gamma * q_table.get_action_value(state_prime, action_prime) - q_table.get_action_value(state, action))
+                
+                # update qtable
+                q_table.update_state(state, action, new_q_s_a)
+                
+                
+                # Change the display
+                self.game.display.update( self.game.state.data )
+                
+                # Allow for game specific conditions (winning, losing, etc.)
+                self.game.rules.process(self.game.state, self.game)
+                self.game.numMoves += 1
 
-                    # Take action, observe R, S'
-                    self.game.moveHistory.append( (0, action) )
-                    self.game.state = self.game.state.generateSuccessor( 0, action )
-                    reward = pacman_agent.get_reward(self.game.state.data)
-                    state_prime = pacman_agent.get_state_representation(self.game.state.deepCopy())
-                    # choose action' from S'
-                    legal_actions = self.game.state.getLegalPacmanActions()
-                    action_prime = epsilonGreedy(q_table, state_prime, legal_actions, epsilon)
-                    
-                    new_q_s_a = q_table.get_action_value(state, action) + alpha * (reward + gamma * q_table.get_action_value(state_prime, action_prime) - q_table.get_action_value(state, action))
-                    
-                    # update qtable
-                    q_table.update_state(state, action, new_q_s_a)
-                    
-                    
-                    # Change the display
-                    self.game.display.update( self.game.state.data )
-                    
-                    # Allow for game specific conditions (winning, losing, etc.)
-                    self.game.rules.process(self.game.state, self.game)
-                    self.game.numMoves += 1
+                if self.game.gameOver:
+                    continue
 
-                    self.run_ghost(ghost_agents)
-                    
-                    state = state_prime
-                    action = action_prime
+                self.run_ghost(ghost_agents)
+                
+                state = state_prime
+                action = action_prime
 
-                q_table.save(filename)   
-            except Exception as e:
-                print(e)
-                continue 
-        self.game.display.finish()
+            q_table.save(filename)   
+            
+        start_game.display.finish()
 
     def run_ghost(self, ghost_agents):
         agent_index = 1
@@ -123,6 +84,7 @@ class RunGame:
 
             # Execute the action
             self.game.moveHistory.append( (agent_index, action) )
+            
             self.game.state = self.game.state.generateSuccessor( agent_index, action )
 
             # Change the display

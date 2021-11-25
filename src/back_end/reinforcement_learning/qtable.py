@@ -28,7 +28,7 @@ class State:
             raise ValueError(f"Invalid west direction {west}.")
         if closest_food_dir not in list(range(4)):
             raise ValueError(f"Invalid closest pellet direction {closest_food_dir}.")
-        if closest_ghost_dir not in list(range(4)):
+        if closest_ghost_dir not in list(range(5)):
             raise ValueError(f"Invalid closest ghost direction {closest_ghost_dir}.")
 
         self.north = north
@@ -79,8 +79,7 @@ class QTable:
     def __init__(self): # TODO: take actions from Directions class as list as an argument
         self.table = {}
         self.actions = ['North', 'East', 'South', 'West'] # TODO: change to a list of actions from Directions class!
-        self.init_table()
-        self.save()
+        
 
     def init_table(self):
         """
@@ -92,7 +91,7 @@ class QTable:
                 for s in range(2): # can go east: 1, cant go east: 0
                     for w in range(2): # can go west: 1, cant go west: 0
                         for p_dir in range(4): # player direction: 0 = north, 1 = east, 2 = south, 3 = west
-                            for g_dir in range(4): # ghost direction: 0 = north, 1 = east, 2 = south, 3 = west
+                            for g_dir in range(5): # ghost direction: 0 = north, 1 = east, 2 = south, 3 = west
                                 state = State(n, e, s, w, p_dir, g_dir)
                                 self.table[hash(state)] = [0]*len(self.get_actions()) # create an entry in the Q-table for the state
 
@@ -150,12 +149,16 @@ class QTable:
         :param filename: name of the file
         """
         dir = "src/back_end/training/" + filename + ".json" 
-        with open(dir, 'r') as f:
-            raw_table = json.load(f)
-            tmp = {}
-            for key in raw_table:
-                tmp[int(key)] = raw_table[key] # make sure key is an integer
-            self.table = tmp
+        if os.path.isfile(dir):
+            with open(dir, 'r') as f:
+                raw_table = json.load(f)
+                tmp = {}
+                for key in raw_table:
+                    tmp[int(key)] = raw_table[key] # make sure key is an integer
+                self.table = tmp
+        else:
+            self.init_table()
+            self.save()
 
     def __str__(self):
         string = ""

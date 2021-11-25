@@ -127,6 +127,8 @@ class AStar:
         Returns:
             The direction of the next step to follow the path.
         """
+        if len(path) == 1:
+            return 4
         starting_node_index = path[0]
         next_node_index = path[1]
         actions = state.getLegalPacmanActions()

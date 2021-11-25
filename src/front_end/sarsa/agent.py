@@ -72,6 +72,7 @@ class SarsaAgent(Agent):
         north, east, south, west = self.get_pacman_position_binary_rep(legal_actions)
         cpd = self.get_closest_position_direction(pacman_pos, closest_food_position, state)
         cgd = self.get_closest_position_direction(pacman_pos, ghost_positions, state)
+        
         state = State(north, east, south, west, cpd, cgd)
         return state
 
@@ -92,8 +93,6 @@ class SarsaAgent(Agent):
         closest = np.inf
         closest_path = None
         for pos in positions:
-            if pacman_position == pos:
-                return 1
             state_copy = copy.deepcopy(state)
             path = self.a_star.a_star(pacman_position, pos, state_copy)
             path_len = len(path)
