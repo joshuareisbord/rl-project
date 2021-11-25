@@ -12,8 +12,8 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-from front_end.util import manhattanDistance
-from front_end.game import Grid
+from front_end.game.util import manhattanDistance
+from front_end.game.game import Grid
 import os
 import random
 
