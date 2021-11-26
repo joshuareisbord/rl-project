@@ -293,8 +293,8 @@ class Actions:
     """
     # Directions
     _directions = {Directions.NORTH: (0, 1),
-                   Directions.SOUTH: (0, -1),
                    Directions.EAST:  (1, 0),
+                   Directions.SOUTH: (0, -1),
                    Directions.WEST:  (-1, 0),
                    Directions.STOP:  (0, 0)}
 
@@ -394,7 +394,7 @@ class GameStateData:
         self._foodEaten = None
         self._foodAdded = None
         self._capsuleEaten = None
-        self._agentMoved = None
+        self.agentMoved = None
         self._lose = False
         self._win = False
         self.scoreChange = 0
@@ -403,7 +403,7 @@ class GameStateData:
         state = GameStateData( self )
         state.food = self.food.deepCopy()
         state.layout = self.layout.deepCopy()
-        state._agentMoved = self._agentMoved
+        state.agentMoved = self.agentMoved
         state._foodEaten = self._foodEaten
         state._foodAdded = self._foodAdded
         state._capsuleEaten = self._capsuleEaten

@@ -15,24 +15,29 @@ def epsilonGreedy(qtable: QTable, state: State, actions, epsilon=0.1):
         actions.remove("Stop")
     except ValueError:
         pass
-
+    directions = ['North', 'South', 'East', 'West']
     moves = qtable.get_state_values(state) # gets the Q-values (moves) for the current state
     random_prob = random.random() # random number between 0 and 1
-    new_moves = []
+    action_num = len(actions)
+    new_moves = [0] * action_num
     if 'North' in actions:
-        new_moves.append(moves[0])
+        idx = actions.index('North')
+        new_moves[idx] = moves[0]
     if 'East' in actions:
-        new_moves.append(moves[1])
+        idx = actions.index('East')
+        new_moves[idx] = moves[1]
     if 'South' in actions:
-        new_moves.append(moves[2])
+        idx = actions.index('South')
+        new_moves[idx] = moves[2]
     if 'West' in actions:
-        new_moves.append(moves[3])
+        idx = actions.index('West')
+        new_moves[idx] = moves[3]
     # random move taken with probability epsilon
     if random_prob < epsilon:
         choices = list(zip(moves, actions))
         if choices == []:
-            return "North"
+            return random.choice(directions)
         return random.choice(choices)[1] # get random move [north, east, south, west]
         
     # greedy move
-    return rand_argmax(moves, actions)# get greedy move [north, east, south, west]
+    return rand_argmax(new_moves, actions)# get greedy move [north, east, south, west]

@@ -25,11 +25,10 @@ def two_way_merge_sort(distances, coordinates):
         Sorted distances in ascending order and related coordinates.
     """
     number_of_distances = len(distances)
-    if number_of_distances == 1:
-        return distances, coordinates
+    if number_of_distances == 1 or number_of_distances == 0: return distances, coordinates
     # Gets mid point in list. Coordinates length equals distances length so mid value is the same.
     mid = number_of_distances // 2
-    
+
     # Gets lists to the left of the mid point.
     left_distances = distances[:mid]
     left_coordinates = coordinates[:mid]

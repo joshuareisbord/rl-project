@@ -26,9 +26,9 @@ class State:
             raise ValueError(f"Invalid south direction {south}.")
         if west not in list(range(2)):
             raise ValueError(f"Invalid west direction {west}.")
-        if closest_food_dir not in list(range(4)):
+        if closest_food_dir not in list(range(5)):
             raise ValueError(f"Invalid closest pellet direction {closest_food_dir}.")
-        if closest_ghost_dir not in list(range(5)):
+        if closest_ghost_dir not in list(range(6)):
             raise ValueError(f"Invalid closest ghost direction {closest_ghost_dir}.")
 
         self.north = north
@@ -90,8 +90,8 @@ class QTable:
             for e in range(2): # can go south: 1, cant go south: 0
                 for s in range(2): # can go east: 1, cant go east: 0
                     for w in range(2): # can go west: 1, cant go west: 0
-                        for p_dir in range(4): # player direction: 0 = north, 1 = east, 2 = south, 3 = west
-                            for g_dir in range(5): # ghost direction: 0 = north, 1 = east, 2 = south, 3 = west
+                        for p_dir in range(5): # player direction: 0 = north, 1 = east, 2 = south, 3 = west
+                            for g_dir in range(6): # ghost direction: 0 = north, 1 = east, 2 = south, 3 = west
                                 state = State(n, e, s, w, p_dir, g_dir)
                                 self.table[hash(state)] = [0]*len(self.get_actions()) # create an entry in the Q-table for the state
 

@@ -13,12 +13,17 @@
 import numpy as np
 from back_end.util.a_star import AStar
 from front_end.game.game import Agent, Directions
+from front_end.game.game import Agent, Actions, Directions
+from front_end.game.util import manhattanDistance
+from front_end.game import util
 # from game import Directions
 import random
 import copy
 from back_end.util.sorts import sort_coordinates
 from back_end.reinforcement_learning.qtable import State
 
+
+    
 class SarsaAgent(Agent):
     """
     An agent controlled by the keyboard.
@@ -34,47 +39,38 @@ class SarsaAgent(Agent):
     Possible Directions: {Directions.STOP, Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST}
     """
 
-    def __init__( self, index = 0 ):
+    def __init__( self, index=0):
 
-        self.lastMove = Directions.STOP
         self.index = index
-        self.keys = []
         self.a_star = AStar(None)
-
-    def getAction(self, state):
-        """
-        Function called when it's the agent's turn to move.
-
-        :return move: The move to be made {'Left', 'Right', 'Up', 'Down'}
-        """
-
-        legal_actions = state.getLegalPacmanActions()
-        move = self.getMove(legal_actions)
-
-        return move
-
-    def getMove(self, legal_actions):
-        move = None
-        
-        # If no action is chosen, then STOP will be returned to avoid None type.
-        if move == None:
-            move = Directions.STOP
-        return move
     
-    def get_state_representation(self, state):
-        legal_actions = state.getLegalPacmanActions()
-        pacman_pos = state.getPacmanPosition()
+    def get_state_representation(self, game):
+        legal_actions = game.state.getLegalPacmanActions()
+        pacman_pos = game.state.getPacmanPosition()
 
-        ghost_positions = state.getGhostPositions()
-        food_positions = state.getFood().asList()
-        _, sorted_food_positions = sort_coordinates(food_positions, pacman_pos)
-        closest_food_position = [sorted_food_positions[0]]
-        north, east, south, west = self.get_pacman_position_binary_rep(legal_actions)
-        cpd = self.get_closest_position_direction(pacman_pos, closest_food_position, state)
-        cgd = self.get_closest_position_direction(pacman_pos, ghost_positions, state)
+        ghost_positions = game.state.getGhostPositions()
+        food_positions = game.state.getFood().asList()
+        if len(food_positions) > 0:
+            _, sorted_food_positions = sort_coordinates(food_positions, pacman_pos)
         
+            closest_food_position = [sorted_food_positions[0]]
+            cpd = self.get_closest_position_direction(pacman_pos, closest_food_position, game)
+        else:
+            cpd = 4     # Terminal state
+        north, east, south, west = self.get_pacman_position_binary_rep(legal_actions)
+        
+        dist = self.manhattan(pacman_pos, ghost_positions[0])
+        # if dist < 3:
+        cgd = self.get_closest_position_direction(pacman_pos, ghost_positions, game)
+        # else:
+        #     cgd = 4
         state = State(north, east, south, west, cpd, cgd)
         return state
+
+    def manhattan(self, a, b):
+        (x1, y1) = a
+        (x2, y2) = b
+        return abs(x1 - x2) + abs(y1 - y2)
 
     def get_pacman_position_binary_rep(self, legal_actions):
         north = 0
@@ -89,19 +85,28 @@ class SarsaAgent(Agent):
             else: continue
         return north, east, south, west
 
-    def get_closest_position_direction(self, pacman_position, positions, state):
+    def get_closest_position_direction(self, pacman_position, positions, game):
         closest = np.inf
         closest_path = None
+        game_copy = copy.deepcopy(game)
         for pos in positions:
-            state_copy = copy.deepcopy(state)
-            path = self.a_star.a_star(pacman_position, pos, state_copy)
+            new_game = copy.deepcopy(game_copy)
+            path = self.a_star.a_star(pacman_position, pos, new_game)
+            if path is None: return 4
             path_len = len(path)
             if path_len <= closest:
                 closest = path_len
                 closest_path = path
         
-        closest_direction = self.a_star.get_direction_of_a_star(closest_path, state)
+        closest_direction = self.a_star.get_direction_of_a_star(closest_path, game_copy)
         return closest_direction
 
     def get_reward(self, GameStateData):
-        return GameStateData.scoreChange
+        score = GameStateData.scoreChange
+        if score < -1:
+            return -10
+        if score == -1:
+            return -1
+        else:
+            return 10
+        # return GameStateData.scoreChange

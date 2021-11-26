@@ -14,6 +14,7 @@ def rand_argmax(moves, actions):
     """
     
     # find the index of the highest value
+    directions = ['North', 'South', 'East', 'West']
     max_val = float('-inf')
     max_elems = []
     for val, action in zip(moves, actions):
@@ -28,10 +29,5 @@ def rand_argmax(moves, actions):
         return max_elems[0]
     
     if max_elems == []:
-        return 'North'
+        return  random.choice(directions)
     return random.choice(max_elems)
-
-if __name__ == "__main__":
-    directions = ['north', 'south', 'east', 'west']
-    lst = [0, 0, 1, 1]
-    print(directions[rand_argmax(lst)[0]])

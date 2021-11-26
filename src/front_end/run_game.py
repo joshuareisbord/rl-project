@@ -13,7 +13,7 @@ class RunGame:
         self.game = game
         self.run()
 
-    def run(self, episodes=100, alpha=0.5, gamma=9, epsilon=0.1, filename='q_table'):
+    def run(self, episodes=100, alpha=0.5, gamma=0.9, epsilon=0.1, filename='q_table'):
         """
         Main control loop for game play.
         """
@@ -29,26 +29,29 @@ class RunGame:
             
             self.game.numMoves = 0
 
-            state = pacman_agent.get_state_representation(self.game.state.deepCopy())
+            state = pacman_agent.get_state_representation(copy.deepcopy(self.game))
             
             legal_actions = self.game.state.getLegalPacmanActions()
             # Hash state
             action = epsilonGreedy(q_table, state, legal_actions, epsilon)
+
+            # Get an action
             # choose action, from S using qtable
 
-            
             while not self.game.gameOver:
                 if self.game.gameOver:
                     continue
                 # Take action, observe R, S'
                 self.game.moveHistory.append( (0, action) )
                 self.game.state = self.game.state.generateSuccessor( 0, action )
+                state_prime = pacman_agent.get_state_representation(copy.deepcopy(self.game))
                 reward = pacman_agent.get_reward(self.game.state.data)
-                state_prime = pacman_agent.get_state_representation(self.game.state.deepCopy())
+                
                 # choose action' from S'
                 legal_actions = self.game.state.getLegalPacmanActions()
                 action_prime = epsilonGreedy(q_table, state_prime, legal_actions, epsilon)
-                
+
+                # Get an action
                 new_q_s_a = q_table.get_action_value(state, action) + alpha * (reward + gamma * q_table.get_action_value(state_prime, action_prime) - q_table.get_action_value(state, action))
                 
                 # update qtable
@@ -56,6 +59,7 @@ class RunGame:
                 
                 
                 # Change the display
+                self.game.state.data.agentMoved = 0
                 self.game.display.update( self.game.state.data )
                 
                 # Allow for game specific conditions (winning, losing, etc.)
@@ -88,6 +92,7 @@ class RunGame:
             self.game.state = self.game.state.generateSuccessor( agent_index, action )
 
             # Change the display
+            self.game.state.data.agentMoved = 1
             self.game.display.update( self.game.state.data )
             
             # Allow for game specific conditions (winning, losing, etc.)

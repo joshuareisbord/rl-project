@@ -234,7 +234,7 @@ class PacmanGraphics:
         refresh()
 
     def update(self, newState):
-        agentIndex = newState._agentMoved
+        agentIndex = newState.agentMoved
         agentState = newState.agentStates[agentIndex]
 
         if self.agentImages[agentIndex][0].isPacman != agentState.isPacman: self.swapImages(agentIndex, agentState)
