@@ -1,12 +1,13 @@
 import numpy
 import json
 import os
+
 class State:
     """
     Individual State object.
     """
     
-    def __init__(self, north, east, south, west, closest_food_dir, closest_ghost_dir):
+    def __init__(self, north, east, south, west, closest_food_dir, closest_ghost_dir, ghost_in_prox):
         """
         Initializes the state.
 
@@ -28,8 +29,10 @@ class State:
             raise ValueError(f"Invalid west direction {west}.")
         if closest_food_dir not in list(range(5)):
             raise ValueError(f"Invalid closest pellet direction {closest_food_dir}.")
-        if closest_ghost_dir not in list(range(6)):
+        if closest_ghost_dir not in list(range(5)):
             raise ValueError(f"Invalid closest ghost direction {closest_ghost_dir}.")
+        if ghost_in_prox not in list(range(2)):
+            raise ValueError(f"Invalid proximity bit {ghost_in_prox}.")
 
         self.north = north
         self.east = east
@@ -37,13 +40,15 @@ class State:
         self.west = west
         self.closest_food_dir = closest_food_dir
         self.closest_ghost_dir = closest_ghost_dir
+        self.ghost_in_prox = ghost_in_prox
+        
 
     def as_tuple(self):
         """
         Function returns a tuple representation of the state.
         :return: A tuple representation of the state.
         """
-        return (self.north, self.east, self.south, self.west, self.closest_food_dir, self.closest_ghost_dir)
+        return (self.north, self.east, self.south, self.west, self.closest_food_dir, self.closest_ghost_dir, self.ghost_in_prox)
 
     def __eq__(self, other):
         """
@@ -59,20 +64,21 @@ class State:
         and self.west == other.west \
         and self.closest_food_dir == other.closest_food_dir \
         and self.closest_ghost_dir == other.closest_ghost_dir \
+        and self.ghost_in_prox == other.ghost_in_prox \
 
     def __repr__(self):
         """
         Function returns a string representation of the state.
         :return: A string representation of the state.
         """
-        return str((self.north, self.east, self.south, self.west, self.closest_food_dir, self.closest_ghost_dir))
+        return str((self.north, self.east, self.south, self.west, self.closest_food_dir, self.closest_ghost_dir, self.ghost_in_prox))
 
     def __hash__(self):
         """
         Function returns a hash of the state.
         :return: A hash of the state.
         """
-        return hash((self.north, self.east, self.south, self.west, self.closest_food_dir, self.closest_ghost_dir))
+        return hash((self.north, self.east, self.south, self.west, self.closest_food_dir, self.closest_ghost_dir, self.ghost_in_prox))
 
 class QTable:
 
@@ -91,9 +97,10 @@ class QTable:
                 for s in range(2): # can go east: 1, cant go east: 0
                     for w in range(2): # can go west: 1, cant go west: 0
                         for p_dir in range(5): # player direction: 0 = north, 1 = east, 2 = south, 3 = west
-                            for g_dir in range(6): # ghost direction: 0 = north, 1 = east, 2 = south, 3 = west
-                                state = State(n, e, s, w, p_dir, g_dir)
-                                self.table[hash(state)] = [0]*len(self.get_actions()) # create an entry in the Q-table for the state
+                            for g_dir in range(5): # ghost direction: 0 = north, 1 = east, 2 = south, 3 = west
+                                for prox in range(2):
+                                    state = State(n, e, s, w, p_dir, g_dir, prox)
+                                    self.table[hash(state)] = [0]*len(self.get_actions()) # create an entry in the Q-table for the state
 
     def get_table(self):
         """
