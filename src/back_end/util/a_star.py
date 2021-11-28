@@ -55,11 +55,12 @@ class AStar:
             A 1D array of the shortest path from the start to the end position. Each index
             of the path represents a position on the 1D board representation.
         """
+        end = (int(end[0]), int(end[1]))
+
         start_node = AStarNode(start)
         start_node.g = start_node.h = start_node.f = 0
         end_node = AStarNode(end)
         end_node.g = end_node.h = end_node.f = 0
-
         end_node_x = end_node.position[0]
         end_node_y = end_node.position[1]
         
@@ -139,7 +140,7 @@ class AStar:
             The direction of the next step to follow the path.
         """
         if len(path) == 1:
-            return 5
+            return 4
         starting_node_index = path[0]
         next_node_index = path[1]
         actions = game.state.getLegalPacmanActions()

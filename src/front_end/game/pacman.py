@@ -269,12 +269,12 @@ class ClassicGameRules:
     def __init__(self, timeout=30):
         self.timeout = timeout
 
-    def newGame( self, layout, pacmanAgent, ghostAgents, display):
+    def newGame( self, layout, pacmanAgent, ghostAgents, display, method):
 
         agents = [pacmanAgent] + ghostAgents[:layout.getNumGhosts()]
         initState = GameState()
         initState.initialize( layout, len(ghostAgents) )
-        game = Game(agents, display, self)
+        game = Game(agents, display, method, self)
         game.state = initState
         self.initialState = initState.deepCopy()
         return game
@@ -439,7 +439,7 @@ class GhostRules:
             # Added for first-person
             state.data._eaten[agentIndex] = True
         else:
-            if not state.data._win:
+            if not state.data._win: # this means you lost the game
                 state.data.scoreChange -= 500
                 state.data._lose = True
     collide = staticmethod( collide )
@@ -481,15 +481,17 @@ def readCommand( argv ):
     parser.add_option('-f', '--frametime', dest='frameTime', type='float',
                       help=default('Time to delay between frames; default is 0.1'), default=0.1)
     parser.add_option('-a', '--agent', type='string', dest='agent',
-                      help=default('Agent Type: KeybardAgent or SarsaAgent'), default='SarsaAgent')
-
+                      help=default('Agent Type: KeybardAgent or PacmanAgent'), default='PacmanAgent')
+    parser.add_option('-m', '--method', type='string', dest='method',
+                      help=default('Method Type: SARSA or QLearning'), default='QLearning')
+    
+    
     options, otherjunk = parser.parse_args(argv)
     if len(otherjunk) != 0:
         raise Exception('Command line input not understood: ' + str(otherjunk))
     args = dict()
 
     args['layout'] = layout.getLayout( options.layout )
-    # if args['layout'] == None: raise Exception("The layout " + options.layout + " cannot be found")
 
     # Load the agent
     # pacman types are 'KeyboardAgent' and 'SarsaAgent'
@@ -504,6 +506,7 @@ def readCommand( argv ):
     from front_end.game import graphicsDisplay
     args['display'] = graphicsDisplay.PacmanGraphics(frameTime = options.frameTime)
     args['timeout'] = 30
+    args['method'] = options.method
 
     return args
 
@@ -522,24 +525,23 @@ def loadPacman(pacmanType):
     Returns a pacman agent class.
     """
     from front_end.game.keyboardAgents import KeyboardAgent
-    from front_end.sarsa.agent import SarsaAgent
+    from front_end.pacman_agent.pacman_agent import PacmanAgent
 
     if pacmanType == 'KeyboardAgent':
         return KeyboardAgent()
-    elif pacmanType == 'SarsaAgent':
-        return SarsaAgent()
+    elif pacmanType == 'PacmanAgent':
+        return PacmanAgent()
 
-def runGames( layout, pacman, ghosts, display, timeout=30 ):
+def runGames( layout, pacman, ghosts, display, method, timeout=30):
     import __main__
     __main__.__dict__['_display'] = display
 
     rules = ClassicGameRules(timeout)
-    games = []
 
     gameDisplay = display
     rules.quiet = False
-    game = rules.newGame(layout, pacman, ghosts, gameDisplay)
-    game.run()
+    game = rules.newGame(layout, pacman, ghosts, gameDisplay, method)
+    games = game.run()
     
     scores = [game.state.getScore() for game in games]
     wins = [game.state.isWin() for game in games]

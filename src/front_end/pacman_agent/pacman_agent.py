@@ -1,15 +1,3 @@
-# keyboardAgents.py
-# -----------------
-# Licensing Information:  You are free to use or extend these projects for
-# educational purposes provided that (1) you do not distribute or publish
-# solutions, (2) you retain this notice, and (3) you provide clear
-# attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
-# Attribution Information: The Pacman AI projects were developed at UC Berkeley.
-# The core projects and autograders were primarily created by John DeNero
-# (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# Student side autograding was added by Brad Miller, Nick Hay, and
-# Pieter Abbeel (pabbeel@cs.berkeley.edu).
 import numpy as np
 from back_end.util.a_star import AStar
 from front_end.game.game import Agent, Directions
@@ -22,29 +10,13 @@ import copy
 from back_end.util.sorts import sort_coordinates
 from back_end.reinforcement_learning.qtable import State
 
-
+class PacmanAgent(Agent):
     
-class SarsaAgent(Agent):
-    """
-    An agent controlled by the keyboard.
-
-    Note: This is a hack way of getting it done, but it works.
-    
-    Legal Actions from: state.getLegalPacmanActions()
-    Pacman Position: state.getPacmanPosition()
-    Ghost Positions: state.getGhostPositions() or state.getGhostPositions(agentIndex)
-
-    Next PacMan state after action from: state.generatePacmanSuccessor(action)
-
-    Possible Directions: {Directions.STOP, Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST}
-    """
-
-    def __init__( self, index=0):
-
+    def __init__(self, index = 0):
         self.index = index
         self.a_star = AStar(None)
-    
-    def get_state_representation(self, game):
+
+    def get_state_representation(self, game, dist_thresh):
         legal_actions = game.state.getLegalPacmanActions()
         pacman_pos = game.state.getPacmanPosition()
 
@@ -60,11 +32,13 @@ class SarsaAgent(Agent):
         north, east, south, west = self.get_pacman_position_binary_rep(legal_actions)
         
         dist = self.manhattan(pacman_pos, ghost_positions[0])
-        # if dist < 3:
         cgd = self.get_closest_position_direction(pacman_pos, ghost_positions, game)
-        # else:
-        #     cgd = 4
-        state = State(north, east, south, west, cpd, cgd)
+        if dist < dist_thresh:
+            prox = 0
+        else:
+            prox = 1
+
+        state = State(north, east, south, west, cpd, cgd, prox)
         return state
 
     def manhattan(self, a, b):
@@ -102,11 +76,11 @@ class SarsaAgent(Agent):
         return closest_direction
 
     def get_reward(self, GameStateData):
-        score = GameStateData.scoreChange
-        if score < -1:
-            return -10
-        if score == -1:
-            return -1
-        else:
-            return 10
-        # return GameStateData.scoreChange
+        # score = GameStateData.scoreChange
+        # if score < -1:
+        #     return -10
+        # if score == -1:
+        #     return -1
+        # else:
+        #     return 100
+        return GameStateData.scoreChange
