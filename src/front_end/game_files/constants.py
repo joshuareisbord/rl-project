@@ -11,4 +11,11 @@
 
 SCARED_TIME = 40    # Moves ghosts are scared
 COLLISION_TOLERANCE = 0.7 # How close ghosts must be to Pacman to kill
-TIME_PENALTY = 1 # Number of points lost each round
+
+#Rewards
+TIME_PENALTY = 2 # Number of points lost each round
+COLLISION_PENALTY = 200 # Penalty for losing game
+PELLET_REWARD = 20  # Reward for consuming pellet
+WIN_REWARD = 500    # Reward for winning game
+
+

@@ -68,7 +68,7 @@ class GhostRules:
             state.data._eaten[agentIndex] = True
         else:
             if not state.data._win: # this means you lost the game
-                state.data.scoreChange -= 500
+                state.data.scoreChange -= COLLISION_PENALTY
                 state.data._lose = True
     collide = staticmethod( collide )
 

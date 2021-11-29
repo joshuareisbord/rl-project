@@ -85,11 +85,4 @@ class PacmanAgent(Agent):
         return closest_direction
 
     def get_reward(self, GameStateData):
-        # score = GameStateData.scoreChange
-        # if score < -1:
-        #     return -10
-        # if score == -1:
-        #     return -1
-        # else:
-        #     return 100
         return GameStateData.scoreChange
