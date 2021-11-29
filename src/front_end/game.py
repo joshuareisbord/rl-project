@@ -54,4 +54,4 @@ class Game:
         Creates a RunGame instance which has its run() method called.
         """
         game = RunGame(self)
-        return game.games
+        return game.games, game.data

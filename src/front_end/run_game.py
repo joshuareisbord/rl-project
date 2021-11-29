@@ -12,6 +12,7 @@ class RunGame:
     def __init__(self, game):
         self.game = game
         self.games = []
+        self.data = [[],[],[]]
         self.run()
 
     def run(self):
@@ -35,10 +36,10 @@ class RunGame:
             None
         """
         print("Running SARSA.")
-        
         q_table = QTable()
         # List of starting game states. Used to get information about each game once completed.
         start_game = [copy.deepcopy(self.game) for _ in range(episodes)]
+        time_steps = 0
         for episode in range(episodes):
             q_table.load(filename)                              # Load QTable
             self.game = start_game[episode]                     # Get starting game object state
@@ -89,9 +90,12 @@ class RunGame:
                 
                 state = state_prime
                 action = action_prime
+                time_steps += 1
 
             self.games.append(self.game)
             q_table.save(filename)   
+            # self.data.append((self.game.method, episode, time_steps))
+            self.data[0].append(self.game.method), self.data[1].append(episode), self.data[2].append(time_steps)
             
         if not self.game.verbose: self.game.display.finish()
 
@@ -102,9 +106,9 @@ class RunGame:
         print("Running QLearning")
         q_table = QTable()
         start_game = [copy.deepcopy(self.game) for _ in range(episodes)]
+        time_steps = 0
         for episode in range(episodes):
             self.game = copy.deepcopy(start_game[episode])
-            print(self.game.verbose)
             if not self.game.verbose: self.game.display.initialize(self.game.state.data)
             pacman_agent = self.game.agents[0]
             ghost_agents = self.game.agents[1:]
@@ -148,9 +152,13 @@ class RunGame:
                 self.run_ghost(ghost_agents)
                 
                 state = state_prime
+                time_steps += 1
                 
             self.games.append(self.game)
-            q_table.save(filename)   
+            q_table.save(filename)
+            # self.data.append((self.game.method, episode, time_steps))
+            self.data[0].append(self.game.method), self.data[1].append(episode), self.data[2].append(time_steps)
+
             
         if not self.game.verbose: self.game.display.finish()
 
