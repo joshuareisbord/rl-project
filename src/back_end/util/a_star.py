@@ -8,34 +8,11 @@ class AStar:
     AStar class
     """
 
-    def __init__(self, environment):
+    def __init__(self):
         """
-        Purpose:
-            Default constructor. Set environment and position mapping attributes.
-        Args:
-            self - class instance.
-            environment - instance of the Environment class.
+        Default constructor.
         """
-        self.env = environment
-        # self.position_mapping = self.get_position_coordinates(self.env.length, self.env.width)
-        
-    @staticmethod
-    def get_position_coordinates(length, width):
-        """
-        Purpose:
-            Gets a 2D representation of the board. Is used to calculate Manhattan distance in
-            a star method.
-        Args:
-            length - the length of the board.
-            width - the width of the board.
-        Returns:
-            A 2D array of coordinates.
-        """
-        coordinates = []
-        for x in range(length):
-            for y in range(width):
-                coordinates.append((x, y))
-        return coordinates
+        pass
     
     def a_star(self, start, end, game):
         """

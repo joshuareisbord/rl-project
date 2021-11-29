@@ -95,7 +95,7 @@ class RunGame:
             
         self.game.display.finish()
 
-    def run_qlearning(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.05, filename='Qlearning_q_table'):
+    def run_qlearning(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.05, filename='Qlearning_q_table_temp'):
         """
         Main control loop for game play.
         """
