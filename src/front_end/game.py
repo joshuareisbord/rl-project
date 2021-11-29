@@ -20,7 +20,7 @@ class Game:
     The Game manages the control flow, soliciting actions from agents.
     """
 
-    def __init__( self, agents, display, method, rules, startingIndex=0):
+    def __init__( self, agents, display, method, rules, episodes, startingIndex=0):
         self.agentCrashed = False
         self.agents = agents
         self.display = display
@@ -28,6 +28,7 @@ class Game:
         self.startingIndex = startingIndex
         self.gameOver = False
         self.method = method
+        self.episodes = episodes
         self.moveHistory = []
         self.totalAgentTimes = [0 for agent in agents]
         self.totalAgentTimeWarnings = [0 for agent in agents]

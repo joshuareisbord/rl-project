@@ -35,10 +35,10 @@ def loadPacman():
     from front_end.agents.pacman_agents import PacmanAgent
     return PacmanAgent()
 
-def runGames(layout, pacman, ghosts, display, method, timeout=30):
+def runGames(layout, pacman, ghosts, display, method, episodes, timeout=30):
 
-    rules = ClassicGameRules(timeout) 
-    game = rules.newGame(layout, pacman, ghosts, display, method)
+    rules = ClassicGameRules(timeout)
+    game = rules.newGame(layout, pacman, ghosts, display, method, episodes)
     games = game.run()
     
     scores = [game.state.getScore() for game in games]
@@ -59,7 +59,7 @@ def runGames(layout, pacman, ghosts, display, method, timeout=30):
 
     return games
 
-def main(layout=None, num_ghosts=1, frame_time=0.1, agent='PacmanAgent', method='QLearning'):
+def main(layout=None, num_ghosts=1, frame_time=0.1, episodes=1, method='QLearning'):
 
     if layout == None:
         raise Exception('No layout specified!')
@@ -69,4 +69,4 @@ def main(layout=None, num_ghosts=1, frame_time=0.1, agent='PacmanAgent', method=
     pacman = loadPacman()
     display = graphicsDisplay.PacmanGraphics(frameTime = frame_time)
 
-    runGames(layout, pacman, ghosts, display, method)
+    runGames(layout, pacman, ghosts, display, method, episodes)
