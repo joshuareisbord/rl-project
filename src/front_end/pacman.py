@@ -10,6 +10,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 import front_end.layout as Layout
+from matplotlib import pyplot as plt
 from front_end.graphics import graphicsDisplay
 from front_end.game_files.classic_rules import ClassicGameRules
 from front_end.agents.ghost_agents import RandomGhost, DirectionalGhost
@@ -35,11 +36,14 @@ def loadPacman():
     from front_end.agents.pacman_agents import PacmanAgent
     return PacmanAgent()
 
-def runGames(layout, pacman, ghosts, display, method, episodes, timeout=30):
+def runGames(layout, pacman, ghosts, display, method, episodes, verbose, timeout=30):
 
     rules = ClassicGameRules(timeout)
-    game = rules.newGame(layout, pacman, ghosts, display, method, episodes)
-    games = game.run()
+    game = rules.newGame(layout, pacman, ghosts, display, method, episodes, verbose)
+    stats = game.run()
+    games = stats[0]
+    learning_stats = stats[1]
+
     
     scores = [game.state.getScore() for game in games]
     wins = [game.state.isWin() for game in games]
@@ -57,9 +61,18 @@ def runGames(layout, pacman, ghosts, display, method, episodes, timeout=30):
     print('Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate))
     print('Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins]))
 
+    print(learning_stats)
+
+    plt.plot(learning_stats[1], learning_stats[2], label=learning_stats[0])
+    plt.ylabel('Time Steps')
+    plt.xlabel('Episodes')
+    plt.legend()
+
+    plt.show()
+
     return games
 
-def main(layout=None, num_ghosts=1, frame_time=0.1, episodes=1, method='QLearning'):
+def main(layout=None, num_ghosts=1, frame_time=0.1, episodes=1, method='QLearning', verbose=False):
 
     if layout == None:
         raise Exception('No layout specified!')
@@ -69,4 +82,4 @@ def main(layout=None, num_ghosts=1, frame_time=0.1, episodes=1, method='QLearnin
     pacman = loadPacman()
     display = graphicsDisplay.PacmanGraphics(frameTime = frame_time)
 
-    runGames(layout, pacman, ghosts, display, method, episodes)
+    runGames(layout, pacman, ghosts, display, method, episodes, verbose)

@@ -12,6 +12,7 @@ class RunGame:
     def __init__(self, game):
         self.game = game
         self.games = []
+        self.data = [[],[],[]]
         self.run()
 
     def run(self):
@@ -35,14 +36,14 @@ class RunGame:
             None
         """
         print("Running SARSA.")
-        
         q_table = QTable()
         # List of starting game states. Used to get information about each game once completed.
         start_game = [copy.deepcopy(self.game) for _ in range(episodes)]
+        time_steps = 0
         for episode in range(episodes):
             q_table.load(filename)                              # Load QTable
             self.game = start_game[episode]                     # Get starting game object state
-            self.game.display.initialize(self.game.state.data)  # Initialize the GUI
+            if not self.game.verbose: self.game.display.initialize(self.game.state.data)  # Initialize the GUI
             pacman_agent = self.game.agents[0]                  # Get Pacman Agent object
             ghost_agents = self.game.agents[1:]                 # Get Ghost Agent Objects
             
@@ -76,7 +77,7 @@ class RunGame:
                 
                 # Change the display
                 self.game.state.data.agentMoved = 0
-                self.game.display.update( self.game.state.data )
+                if not self.game.verbose: self.game.display.update( self.game.state.data )
                 
                 # Allow for game specific conditions (winning, losing, etc.)
                 self.game.rules.process(self.game.state, self.game)
@@ -89,11 +90,14 @@ class RunGame:
                 
                 state = state_prime
                 action = action_prime
+                time_steps += 1
 
             self.games.append(self.game)
             q_table.save(filename)   
+            # self.data.append((self.game.method, episode, time_steps))
+            self.data[0].append(self.game.method), self.data[1].append(episode), self.data[2].append(time_steps)
             
-        self.game.display.finish()
+        if not self.game.verbose: self.game.display.finish()
 
     def run_qlearning(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.05, filename='Qlearning_q_table_temp'):
         """
@@ -102,9 +106,10 @@ class RunGame:
         print("Running QLearning")
         q_table = QTable()
         start_game = [copy.deepcopy(self.game) for _ in range(episodes)]
+        time_steps = 0
         for episode in range(episodes):
             self.game = copy.deepcopy(start_game[episode])
-            self.game.display.initialize(self.game.state.data)
+            if not self.game.verbose: self.game.display.initialize(self.game.state.data)
             pacman_agent = self.game.agents[0]
             ghost_agents = self.game.agents[1:]
             
@@ -135,7 +140,7 @@ class RunGame:
                 
                 # Change the display
                 self.game.state.data.agentMoved = 0
-                self.game.display.update( self.game.state.data )
+                if not self.game.verbose: self.game.display.update( self.game.state.data )
                 
                 # Allow for game specific conditions (winning, losing, etc.)
                 self.game.rules.process(self.game.state, self.game)
@@ -147,11 +152,15 @@ class RunGame:
                 self.run_ghost(ghost_agents)
                 
                 state = state_prime
+                time_steps += 1
                 
             self.games.append(self.game)
-            q_table.save(filename)   
+            q_table.save(filename)
+            # self.data.append((self.game.method, episode, time_steps))
+            self.data[0].append(self.game.method), self.data[1].append(episode), self.data[2].append(time_steps)
+
             
-        self.game.display.finish()
+        if not self.game.verbose: self.game.display.finish()
 
     def run_ghost(self, ghost_agents):
         """
@@ -176,7 +185,7 @@ class RunGame:
 
             # Change the display
             self.game.state.data.agentMoved = 1
-            self.game.display.update( self.game.state.data )
+            if not self.game.verbose: self.game.display.update( self.game.state.data )
             
             # Allow for game specific conditions (winning, losing, etc.)
             self.game.rules.process(self.game.state, self.game)
