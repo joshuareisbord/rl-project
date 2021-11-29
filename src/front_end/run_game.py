@@ -42,7 +42,7 @@ class RunGame:
         for episode in range(episodes):
             q_table.load(filename)                              # Load QTable
             self.game = start_game[episode]                     # Get starting game object state
-            self.game.display.initialize(self.game.state.data)  # Initialize the GUI
+            if not self.game.verbose: self.game.display.initialize(self.game.state.data)  # Initialize the GUI
             pacman_agent = self.game.agents[0]                  # Get Pacman Agent object
             ghost_agents = self.game.agents[1:]                 # Get Ghost Agent Objects
             
@@ -76,7 +76,7 @@ class RunGame:
                 
                 # Change the display
                 self.game.state.data.agentMoved = 0
-                self.game.display.update( self.game.state.data )
+                if not self.game.verbose: self.game.display.update( self.game.state.data )
                 
                 # Allow for game specific conditions (winning, losing, etc.)
                 self.game.rules.process(self.game.state, self.game)
@@ -93,7 +93,7 @@ class RunGame:
             self.games.append(self.game)
             q_table.save(filename)   
             
-        self.game.display.finish()
+        if not self.game.verbose: self.game.display.finish()
 
     def run_qlearning(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.05, filename='Qlearning_q_table'):
         """
@@ -104,7 +104,8 @@ class RunGame:
         start_game = [copy.deepcopy(self.game) for _ in range(episodes)]
         for episode in range(episodes):
             self.game = copy.deepcopy(start_game[episode])
-            self.game.display.initialize(self.game.state.data)
+            print(self.game.verbose)
+            if not self.game.verbose: self.game.display.initialize(self.game.state.data)
             pacman_agent = self.game.agents[0]
             ghost_agents = self.game.agents[1:]
             
@@ -135,7 +136,7 @@ class RunGame:
                 
                 # Change the display
                 self.game.state.data.agentMoved = 0
-                self.game.display.update( self.game.state.data )
+                if not self.game.verbose: self.game.display.update( self.game.state.data )
                 
                 # Allow for game specific conditions (winning, losing, etc.)
                 self.game.rules.process(self.game.state, self.game)
@@ -151,7 +152,7 @@ class RunGame:
             self.games.append(self.game)
             q_table.save(filename)   
             
-        self.game.display.finish()
+        if not self.game.verbose: self.game.display.finish()
 
     def run_ghost(self, ghost_agents):
         """
@@ -176,7 +177,7 @@ class RunGame:
 
             # Change the display
             self.game.state.data.agentMoved = 1
-            self.game.display.update( self.game.state.data )
+            if not self.game.verbose: self.game.display.update( self.game.state.data )
             
             # Allow for game specific conditions (winning, losing, etc.)
             self.game.rules.process(self.game.state, self.game)

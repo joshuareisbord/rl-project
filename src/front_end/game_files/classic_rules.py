@@ -20,12 +20,12 @@ class ClassicGameRules:
     def __init__(self, timeout=30):
         self.timeout = timeout
 
-    def newGame(self, layout, pacmanAgent, ghostAgents, display, method, episodes):
+    def newGame(self, layout, pacmanAgent, ghostAgents, display, method, episodes, verbose):
 
         agents = [pacmanAgent] + ghostAgents[:layout.getNumGhosts()]
         initState = GameState()
         initState.initialize( layout, len(ghostAgents) )
-        game = Game(agents, display, method, self, episodes)
+        game = Game(agents, display, method, self, episodes, verbose)
         game.state = initState
         self.initialState = initState.deepCopy()
         return game
