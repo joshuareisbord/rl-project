@@ -20,7 +20,7 @@ class RunGame:
         if self.game.method == 'QLearning':
             self.run_qlearning()
 
-    def run_sarsa(self, episodes=300, alpha=0.5, gamma=0.9, epsilon=0.01, filename='q_t'):
+    def run_sarsa(self, episodes=2, alpha=0.5, gamma=0.9, epsilon=0.01, filename='SARSA_q_table'):
         """
         Main control loop for game play.
         """
@@ -88,7 +88,7 @@ class RunGame:
             
         self.game.display.finish()
 
-    def run_qlearning(self, episodes=50, alpha=0.5, gamma=0.9, epsilon=0.05, filename='q_t'):
+    def run_qlearning(self, episodes=1, alpha=0.5, gamma=0.9, epsilon=0.05, filename='Qlearning_q_table'):
         """
         Main control loop for game play.
         """

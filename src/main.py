@@ -1,5 +1,6 @@
+import os
+from front_end import pacman
 
-from front_end.game import pacman
-
-
-pacman.main('pacman.py --layout=smallClassicTest2 --agent=PacmanAgent --numghosts=1 --frametime=0.01 --method=SARSA')
+dir_path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(dir_path)
+pacman.main(layout='SmallClassicTest2')

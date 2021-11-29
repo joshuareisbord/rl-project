@@ -144,8 +144,8 @@ class QTable:
         :param filename: name of the file
         """
         
-        dir = "src/back_end/training/" + filename + ".json"
-        with open(dir, 'w') as f:
+        file = os.getcwd() + "/back_end/q_tables/" + filename + ".json"
+        with open(file, 'w') as f:
             json.dump(self.table, f, indent=4)
 
     def load(self, filename='q_table'):
@@ -153,9 +153,9 @@ class QTable:
         Loads the Q-Table from a file.
         :param filename: name of the file
         """
-        dir = "src/back_end/training/" + filename + ".json" 
-        if os.path.isfile(dir):
-            with open(dir, 'r') as f:
+        file = os.getcwd() + "/back_end/q_tables/" + filename + ".json"
+        if os.path.isfile(file):
+            with open(file, 'r') as f:
                 raw_table = json.load(f)
                 tmp = {}
                 for key in raw_table:
