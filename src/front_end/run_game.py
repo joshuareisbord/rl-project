@@ -22,34 +22,41 @@ class RunGame:
 
     def run_sarsa(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.01, filename='SARSA_q_table'):
         """
-        Main control loop for game play.
+        Purpose:
+            SARSA Algorithm for controlling Pacman.
+        Args:
+            self - class instance.
+            episodes - the number of episodes to run.
+            alpha - the alpha value to use.
+            gamma - the gamma value to use.
+            epsilon - the epsilon value to use.
+            filename - the name of the qtable to load/create.
+        Returns:
+            None
         """
-        q_table = QTable()
-        print("Running SARSA")
-        start_game = [copy.deepcopy(self.game) for _ in range(episodes)]
+        print("Running SARSA.")
         
+        q_table = QTable()
+        # List of starting game states. Used to get information about each game once completed.
+        start_game = [copy.deepcopy(self.game) for _ in range(episodes)]
         for episode in range(episodes):
-            self.game = copy.deepcopy(start_game[episode])
-            self.game.display.initialize(self.game.state.data)
-            pacman_agent = self.game.agents[0]
-            ghost_agents = self.game.agents[1:]
+            q_table.load(filename)                              # Load QTable
+            self.game = start_game[episode]                     # Get starting game object state
+            self.game.display.initialize(self.game.state.data)  # Initialize the GUI
+            pacman_agent = self.game.agents[0]                  # Get Pacman Agent object
+            ghost_agents = self.game.agents[1:]                 # Get Ghost Agent Objects
             
-            q_table.load(filename)
-            
-            self.game.numMoves = 0
+            self.game.numMoves = 0                              # Initialize move counter.
 
+            # Gets the state object to query qtable.
             state = pacman_agent.get_state_representation(copy.deepcopy(self.game), 6)
-            
+            # Get all actions Pacman can take.
             legal_actions = self.game.state.getLegalPacmanActions()
-            # Hash state
+            # Get an action given the current state based on epsilon greedy policy.
             action = epsilonGreedy(q_table, state, legal_actions, epsilon)
-
-            # Get an action
-            # choose action, from S using qtable
-
+            # Loop until the terminal state is reached
             while not self.game.gameOver:
-                if self.game.gameOver:
-                    continue
+                if self.game.gameOver: continue
                 # Take action, observe R, S'
                 self.game.moveHistory.append( (0, action) )
                 self.game.state = self.game.state.generateSuccessor( 0, action )
@@ -147,6 +154,15 @@ class RunGame:
         self.game.display.finish()
 
     def run_ghost(self, ghost_agents):
+        """
+        Purpose:
+            Updates the ghosts position.
+        Args:
+            self - class instance
+            ghost_agents - list of ghost agent objects.
+        Returns:
+            None
+        """
         agent_index = 1
         for agent in ghost_agents:
             observation = self.game.state.deepCopy()
@@ -156,7 +172,6 @@ class RunGame:
 
             # Execute the action
             self.game.moveHistory.append( (agent_index, action) )
-            
             self.game.state = self.game.state.generateSuccessor( agent_index, action )
 
             # Change the display
@@ -168,3 +183,4 @@ class RunGame:
 
             self.game.numMoves += 1
             agent_index += 1
+        return

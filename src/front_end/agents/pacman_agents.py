@@ -26,40 +26,21 @@ class PacmanAgent(Agent):
         self.a_star = AStar(None)
 
     def get_state_representation(self, game, dist_thresh):
-        legal_actions = game.state.getLegalPacmanActions()
         pacman_pos = game.state.getPacmanPosition()
 
-        ghost_positions = game.state.getGhostPositions()
-        food_positions = game.state.getFood().asList()
-        if len(food_positions) > 0:
-            _, sorted_food_positions = sort_coordinates(food_positions, pacman_pos)
         
-            closest_food_position = [sorted_food_positions[0]]
-            cpd = self.get_closest_position_direction(pacman_pos, closest_food_position, game)
-        else:
-            cpd = 4     # Terminal state
-        north, east, south, west = self.get_pacman_position_binary_rep(legal_actions)
         
-        dist = self.manhattan(pacman_pos, ghost_positions[0])
-        cgd = self.get_closest_position_direction(pacman_pos, ghost_positions, game)
-        if dist < dist_thresh:
-            prox = 0
-        else:
-            prox = 1
-
-        state = State(north, east, south, west, cpd, cgd, prox)
+        north, east, south, west = self.get_pacman_representation(game)
+        closest_food_direction = self.get_food_representation(game, pacman_pos)
+        closest_ghost_direction, proximity = self.ghost_representation(game, pacman_pos, dist_thresh)
+        
+        state = State(north, east, south, west, closest_food_direction, closest_ghost_direction, proximity)
         return state
 
-    def manhattan(self, a, b):
-        (x1, y1) = a
-        (x2, y2) = b
-        return abs(x1 - x2) + abs(y1 - y2)
 
-    def get_pacman_position_binary_rep(self, legal_actions):
-        north = 0
-        east = 0
-        south = 0
-        west = 0
+    def get_pacman_representation(self, game):
+        legal_actions = game.state.getLegalPacmanActions()
+        north = east = south = west = 0
         for action in legal_actions:
             if action == "North": north = 1
             elif action == "East": east = 1
@@ -67,6 +48,29 @@ class PacmanAgent(Agent):
             elif action == "West": west = 1
             else: continue
         return north, east, south, west
+
+    def get_food_representation(self, game, pacman_pos):
+        food_positions = game.state.getFood().asList()
+        if len(food_positions) > 0:
+            _, sorted_food_positions = sort_coordinates(food_positions, pacman_pos)
+        
+            closest_food_position = [sorted_food_positions[0]]
+            return self.get_closest_position_direction(pacman_pos, closest_food_position, game)
+        else:
+            return 4     # Terminal state
+
+    def ghost_representation(self, game, pacman_pos, dist_thresh):
+        ghost_positions = game.state.getGhostPositions()
+        dist = manhattanDistance(pacman_pos, ghost_positions[0])
+        closest_ghost_direction = self.get_closest_position_direction(pacman_pos, ghost_positions, game)
+
+        if dist < dist_thresh:
+            proximity = 0
+        else:
+            proximity = 1
+
+        return closest_ghost_direction, proximity
+
 
     def get_closest_position_direction(self, pacman_position, positions, game):
         closest = np.inf
