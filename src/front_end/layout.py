@@ -106,7 +106,6 @@ class Layout:
             self.numGhosts += 1
 
 def getLayout(name):
-    # FIXME
     try:
         # gets the file form the absolute directory.
         file = os.getcwd() + "/front_end/layouts/" + name + ".lay"
