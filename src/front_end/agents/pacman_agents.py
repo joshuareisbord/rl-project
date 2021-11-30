@@ -113,7 +113,7 @@ class PacmanAgent(Agent):
         # Check if Pacman is currently in a terminal state.
         if len(food_positions) > 0:
             # Get a sorted list of food positions. Ascending in distance from Pacman.
-            _, sorted_food_positions = sort_coordinates(food_positions, pacman_pos)
+            sorted_food_positions = sort_coordinates(food_positions, pacman_pos)
             closest_food_position = [sorted_food_positions[0]]
             # Get the direction of the closest food position.
             return self.get_closest_position_direction(pacman_pos, closest_food_position, game)
