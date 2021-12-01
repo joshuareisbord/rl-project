@@ -11,9 +11,7 @@
 
 import os
 import json
-import multiprocessing as mp
 import front_end.layout as Layout
-from matplotlib import pyplot as plt
 from front_end.graphics import graphicsDisplay
 from front_end.game_files.classic_rules import ClassicGameRules
 from front_end.agents.ghost_agents import RandomGhost, DirectionalGhost
@@ -65,17 +63,10 @@ def runGames(layout, pacman, ghosts, display, method, episodes, verbose, multith
     print('Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins]))
 
     file_name = "stats.json"
-    if multithreaded:
+    if multithreaded: # dumps stats collected to appropriate .json file
         file_name = str(os.getpid()) + file_name
     with open(file_name, 'w') as f:
         json.dump(learning_stats, f, indent=4)
-
-    # plt.plot(learning_stats[1], learning_stats[2], label=learning_stats[0])
-    # plt.ylabel('Time Steps')
-    # plt.xlabel('Episodes')
-    # plt.legend()
-
-    # plt.show()
 
     return games
 

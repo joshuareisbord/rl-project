@@ -15,7 +15,7 @@ class RunGame:
         """
         self.game = game
         self.games = []
-        self.data = [[],[],[]]
+        self.data = [[],[],[], [], [], []]
         self.run()
 
     def run(self):
@@ -28,8 +28,33 @@ class RunGame:
         """
         if self.game.method == 'SARSA':
             self.run_sarsa(episodes=self.game.episodes)
-        if self.game.method == 'QLearning':
+        elif self.game.method == 'QLearning':
             self.run_qlearning(episodes=self.game.episodes)
+        else:
+            print("Invalid method {self.game.method}! Method must be 'SARSA' or 'QLearning'.")
+            exit(1)
+
+    def collect_data(self, method, episode, total_timesteps, episode_timesteps, total_reward, episode_reward):
+        """
+        Purpose:
+            Collects data for graphing.
+        Args:
+            episode - the episode number.
+            total_timesteps - the total timesteps taken since episode 0
+            episode_timesteps - the timesteps taken in this episode.
+            total_reward - the total reward since episode 0.
+            episode_reward - the total reward in this episode.
+        Returns:
+            None
+        """
+        if self.data[0] == []:
+            self.data[0].append(method)
+        self.data[1].append(episode)
+        self.data[2].append(total_timesteps)
+        self.data[3].append(episode_timesteps)
+        self.data[4].append(total_reward)
+        self.data[5].append(episode_reward)
+                
 
     def run_sarsa(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.01, filename='SARSA_QTable'):
         """
@@ -47,14 +72,21 @@ class RunGame:
         """
         if self.game.multithreaded:
             filename = str(os.getpid()) + '_' + filename
+
         print("Running SARSA.")
+
         q_table = QTable()
         # List of starting game states. Used to get information about each game once completed.
         start_game = [copy.deepcopy(self.game) for _ in range(episodes)]
-        time_steps = 0
+        total_timesteps = 0
+        total_reward = 0
         for episode in range(episodes):
+            episode_timesteps = 0
+            episode_reward = 0
+
             q_table.load(filename)                                                          # Load QTable
             self.game = start_game[episode]                                                 # Get starting game object state
+
             if not self.game.verbose: self.game.display.initialize(self.game.state.data)    # Initialize the GUI
             
             pacman_agent = self.game.agents[0]                  # Get Pacman Agent object
@@ -67,6 +99,7 @@ class RunGame:
             legal_actions = self.game.state.getLegalPacmanActions()
             # Get an action given the current state based on epsilon greedy policy.
             action = epsilonGreedy(q_table, state, legal_actions, epsilon)
+
             # Loop until the terminal state is reached
             while not self.game.gameOver:
                 # Take action, observe R, S'
@@ -85,7 +118,6 @@ class RunGame:
                 # Update qtable.
                 q_table.update_state(state, action, new_q_s_a)
                 
-                
                 # Change the display
                 self.game.state.data.agentMoved = 0
                 if not self.game.verbose: self.game.display.update( self.game.state.data )
@@ -100,15 +132,22 @@ class RunGame:
                 # Moves the ghost.
                 self.run_ghost(ghost_agents)
                 
+                # S <- S'
+                # A <- A'
                 state = state_prime
                 action = action_prime
-                time_steps += 1
+
+                episode_timesteps += 1
+                total_timesteps += 1
+                total_reward += 1
+                episode_reward += 1
 
             self.games.append(self.game)
             q_table.save(filename)
             # Update data with results. Used to make graphs.
-            self.data[0].append(self.game.method), self.data[1].append(episode), self.data[2].append(time_steps)
-            
+            self.collect_data(self.game.method, episode, total_timesteps, episode_timesteps, total_reward, episode_reward)
+
+        # close the display when the game terminates.
         if not self.game.verbose: self.game.display.finish()
 
     def run_qlearning(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.05, filename='Qlearning_QTable'):
@@ -127,12 +166,16 @@ class RunGame:
         """
         if self.game.multithreaded:
             filename = str(os.getpid()) + '_' + filename
+        
         print("Running QLearning")
         q_table = QTable()
         # List of starting game states. Used to get information about each game once completed.
         start_game = [copy.deepcopy(self.game) for _ in range(episodes)]
-        time_steps = 0
+        total_timesteps = 0
+        total_reward = 0
         for episode in range(episodes):
+            episode_timesteps = 0
+            episode_reward = 0
             q_table.load(filename)                                                          # Load QTable
             self.game = start_game[episode]                                                 # Get starting game object state
             if not self.game.verbose: self.game.display.initialize(self.game.state.data)    # Initialize the GUI
@@ -160,7 +203,6 @@ class RunGame:
                 # Update qtable.
                 q_table.update_state(state, action, new_q_s_a)
                 
-                
                 # Change the display
                 self.game.state.data.agentMoved = 0
                 if not self.game.verbose: self.game.display.update( self.game.state.data )
@@ -175,14 +217,20 @@ class RunGame:
                 # Move the ghost.
                 self.run_ghost(ghost_agents)
                 
+                # S <- S'
                 state = state_prime
-                time_steps += 1
-                
+
+                episode_timesteps += 1
+                total_timesteps += 1
+                total_reward += 1
+                episode_reward += 1
+            
             self.games.append(self.game)
             q_table.save(filename)
             # Update data with results. Used to make graphs.
-            self.data[0].append(self.game.method), self.data[1].append(episode), self.data[2].append(time_steps)
+            self.collect_data(self.game.method, episode, total_timesteps, episode_timesteps, total_reward, episode_reward)
 
+        # close the display when the game terminates.
         if not self.game.verbose: self.game.display.finish()
 
     def run_ghost(self, ghost_agents):

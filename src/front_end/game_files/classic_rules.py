@@ -9,6 +9,7 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
+import os
 from front_end.game import Game
 from front_end.game_files.game_state import GameState
 
@@ -38,11 +39,17 @@ class ClassicGameRules:
         if state.isLose(): self.lose(state, game)
 
     def win( self, state, game ):
-        print("Pacman emerges victorious! Score: %d" % state.data.score)
+        if game.multithreaded: # if this is the only instance, print out the results.
+            print(str(os.getpid()) + " - Pacman emerges victorious! Score: %d" % state.data.score)
+        else:
+            print("Pacman emerges victorious! Score: %d" % state.data.score)
         game.gameOver = True
 
     def lose( self, state, game ):
-        print("Pacman died! Score: %d" % state.data.score)
+        if game.multithreaded: # if this is the only instance, print out the results.
+            print(str(os.getpid()) + " - Pacman died! Score: %d" % state.data.score)
+        else:
+            print("Pacman died! Score: %d" % state.data.score)
         game.gameOver = True
 
     def getProgress(self, game):
