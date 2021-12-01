@@ -24,6 +24,9 @@ Run `docker build -t ${name of container} .` or `sudo docker build -t ${name of 
 Will get a pip warning and a venv warning for now.
 
 ### Run the container
-Run `docker run -it ${name of container}` or `sudo docker run -it ${name of container}`
+Run `docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY ${name of container}` or `sudo docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY ${name of container}`
 The -it flag is used to run the container in a shell so you can see the output.
 
+## Installing x11-xserver-utils to point the docker container to the users display
+Run `sudo apt-get install x11-xserver-utils`
+Run `xhost +local:docker`

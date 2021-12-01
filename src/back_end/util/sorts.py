@@ -1,19 +1,28 @@
-
-
+"""
+Functions are used to sort coordinates based on manhattan distance.
+"""
+from front_end.util import manhattanDistance
 
 def sort_coordinates(coordinates, starting_point):
+    """
+    Purpose:
+        Sort a list of coordinates based on how close they are to the starting position provided.
+        Distance is based on manhattan distance.
+    Args:
+        coordinates - list of coordinates in terms of (x, y).
+        starting_point - the starting position in terms of (x, y).
+    Returns:
+        The coordinates sorted based on distance (ascending)
+    """
     distances = []
+    # Get the distances of each coordinate.
     for position in coordinates:
-        distance = manhattan_distance(starting_point, position)
+        distance = manhattanDistance(starting_point, position)
         distances.append(distance)
-    sorted_distances, sorted_coordinates = two_way_merge_sort(distances, coordinates)
-    return sorted_distances, sorted_coordinates
+    # Sort the two lists based on distance while maintaining index relation.
+    _, sorted_coordinates = two_way_merge_sort(distances, coordinates)
+    return sorted_coordinates
     
-def manhattan_distance(start, end):
-    distance = abs(start[0] - end[0]) + abs(start[1] - end[1])
-    return distance
-
-## Helper functions
 def two_way_merge_sort(distances, coordinates):
     """
     Purpose:

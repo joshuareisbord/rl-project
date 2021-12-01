@@ -2,3 +2,8 @@ version: "3.9"
 services:
   game:
     build: .
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    network_mode: host

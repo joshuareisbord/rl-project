@@ -1,1 +1,1 @@
-# reinforcement_learning module.
+# reinforcement_learning package.
