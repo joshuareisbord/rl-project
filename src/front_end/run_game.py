@@ -1,4 +1,5 @@
 import copy
+import os
 
 from back_end.reinforcement_learning.qtable import QTable
 from back_end.reinforcement_learning.epsilon_greedy import epsilonGreedy
@@ -122,6 +123,7 @@ class RunGame:
         Returns:
             None
         """
+        filename = str(os.getpid()) + '_' + filename
         print("Running QLearning")
         q_table = QTable()
         # List of starting game states. Used to get information about each game once completed.

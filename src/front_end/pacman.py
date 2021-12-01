@@ -9,6 +9,8 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
+import os
+import json
 import front_end.layout as Layout
 from matplotlib import pyplot as plt
 from front_end.graphics import graphicsDisplay
@@ -61,14 +63,17 @@ def runGames(layout, pacman, ghosts, display, method, episodes, verbose, timeout
     print('Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate))
     print('Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins]))
 
-    print(learning_stats)
+    with open(str(os.getpid())+'_stats.json', 'w') as f:
+        json.dump(learning_stats, f, indent=4)
 
-    plt.plot(learning_stats[1], learning_stats[2], label=learning_stats[0])
-    plt.ylabel('Time Steps')
-    plt.xlabel('Episodes')
-    plt.legend()
+    # plt.plot(learning_stats[1], learning_stats[2], label=learning_stats[0])
+    # plt.ylabel('Time Steps')
+    # plt.xlabel('Episodes')
+    # plt.legend()
 
-    plt.show()
+    # plt.show()
+
+    
 
     return games
 
@@ -78,7 +83,7 @@ def main(layout=None, num_ghosts=1, frame_time=0.1, episodes=1, method='QLearnin
         raise Exception('No layout specified!')
 
     layout = Layout.getLayout(layout)
-    ghosts = [loadGhost('DirectionalGhost')( i+1 ) for i in range(num_ghosts)]
+    ghosts = [loadGhost('RandomGhost')( i+1 ) for i in range(num_ghosts)]
     pacman = loadPacman()
     display = graphicsDisplay.PacmanGraphics(frameTime = frame_time)
 

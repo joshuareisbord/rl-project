@@ -85,7 +85,7 @@ class QTable:
     def __init__(self):
         self.table = {}
         self.actions = ['North', 'East', 'South', 'West']
-        self.num_actions = len(self.get_actions)
+        self.num_actions = len(self.get_actions())
         
 
     def init_table(self):
