@@ -15,9 +15,19 @@ def error(message):
 
 if __name__ == "__main__":
 
-                   # [layout, episodes, frame_time, method, verbose, multithreaded]
+                   # [layout, episodes, ghosts, frame_time, method, verbose, multithreaded]
     default_params = ['smallClassicTest2', 10, 1, 0.001, 'QLearning', True, False]
     core_count = 1 # default core ocunt
+
+    print("\nParamaters Set:")
+    print(f"Layout: {default_params[0]}")
+    print(f"Episodes: {default_params[1]}")
+    print(f"Ghosts: {default_params[2]}")
+    print(f"Frame Time: {default_params[3]}")
+    print(f"Method: {default_params[4]}")
+    print(f"No GUI: {default_params[5]}")
+    print(f"Multi-Threaded: {default_params[6]}")
+    print("\n")
 
     selection = input("Change any paramaters? (y/n): ")
 
@@ -33,7 +43,7 @@ if __name__ == "__main__":
             print("6. Use GUI")
             print("7. Finish (any other key)")
             print("\n")
-            to_change = input("Selection:")
+            to_change = input("Selection: ")
 
             # layout (this is the board we are using)
             if to_change == "1":
@@ -95,7 +105,13 @@ if __name__ == "__main__":
             try:
                 choice = int(choice)
                 if choice > os.cpu_count():
-                    error("Invalid input! Must be less than or equal to the number of cores on your machine!")
+                    print("Warning: You have entered a number greater than the number of cores on your machine! Are you sure you want to continue?")
+                    print("If you choose not to continue cores will be set to max avaliable on machine! (y/n) ", end="")
+                    confirm = input("")
+                    if confirm == "y":
+                        core_count = choice
+                    else:
+                        choice = os.cpu_count()
                 elif choice == -1:
                     core_count = os.cpu_count()
                 elif choice == 0:
