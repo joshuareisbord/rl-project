@@ -76,7 +76,7 @@ def main(layout=None, num_ghosts=1, frame_time=0.1, episodes=1, method='QLearnin
         raise Exception('No layout specified!')
 
     layout = Layout.getLayout(layout)
-    ghosts = [loadGhost('RandomGhost')( i+1 ) for i in range(num_ghosts)]
+    ghosts = [loadGhost('DirectionalGhost')( i+1 ) for i in range(num_ghosts)]
     pacman = loadPacman()
     display = graphicsDisplay.PacmanGraphics(frameTime = frame_time)
 
