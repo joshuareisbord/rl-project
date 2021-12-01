@@ -31,7 +31,7 @@ class RunGame:
         if self.game.method == 'QLearning':
             self.run_qlearning(episodes=self.game.episodes)
 
-    def run_sarsa(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.01, filename='SARSA_q_table'):
+    def run_sarsa(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.01, filename='SARSA_QTable'):
         """
         Purpose:
             SARSA Algorithm for controlling Pacman.
@@ -45,6 +45,8 @@ class RunGame:
         Returns:
             None
         """
+        if self.game.multithreaded:
+            filename = str(os.getpid()) + '_' + filename
         print("Running SARSA.")
         q_table = QTable()
         # List of starting game states. Used to get information about each game once completed.
@@ -109,7 +111,7 @@ class RunGame:
             
         if not self.game.verbose: self.game.display.finish()
 
-    def run_qlearning(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.05, filename='Qlearning_q_table'):
+    def run_qlearning(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.05, filename='Qlearning_QTable'):
         """
         Purpose:
             SARSA Algorithm for controlling Pacman.
@@ -123,7 +125,8 @@ class RunGame:
         Returns:
             None
         """
-        filename = str(os.getpid()) + '_' + filename
+        if self.game.multithreaded:
+            filename = str(os.getpid()) + '_' + filename
         print("Running QLearning")
         q_table = QTable()
         # List of starting game states. Used to get information about each game once completed.

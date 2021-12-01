@@ -11,6 +11,7 @@
 
 import os
 import json
+import multiprocessing as mp
 import front_end.layout as Layout
 from matplotlib import pyplot as plt
 from front_end.graphics import graphicsDisplay
@@ -38,10 +39,10 @@ def loadPacman():
     from front_end.agents.pacman_agents import PacmanAgent
     return PacmanAgent()
 
-def runGames(layout, pacman, ghosts, display, method, episodes, verbose, timeout=30):
+def runGames(layout, pacman, ghosts, display, method, episodes, verbose, multithreaded, timeout=30):
 
     rules = ClassicGameRules(timeout)
-    game = rules.newGame(layout, pacman, ghosts, display, method, episodes, verbose)
+    game = rules.newGame(layout, pacman, ghosts, display, method, episodes, verbose, multithreaded)
     stats = game.run()
     games = stats[0]
     learning_stats = stats[1]
@@ -63,7 +64,10 @@ def runGames(layout, pacman, ghosts, display, method, episodes, verbose, timeout
     print('Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate))
     print('Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins]))
 
-    with open(str(os.getpid())+'_stats.json', 'w') as f:
+    file_name = "stats.json"
+    if multithreaded:
+        file_name = str(os.getpid()) + file_name
+    with open(file_name, 'w') as f:
         json.dump(learning_stats, f, indent=4)
 
     # plt.plot(learning_stats[1], learning_stats[2], label=learning_stats[0])
@@ -73,11 +77,9 @@ def runGames(layout, pacman, ghosts, display, method, episodes, verbose, timeout
 
     # plt.show()
 
-    
-
     return games
 
-def main(layout=None, num_ghosts=1, frame_time=0.1, episodes=1, method='QLearning', verbose=False):
+def main(layout=None, num_ghosts=1, frame_time=0.1, episodes=1, method='QLearning', verbose=False, multithreaded=False):
 
     if layout == None:
         raise Exception('No layout specified!')
@@ -87,4 +89,4 @@ def main(layout=None, num_ghosts=1, frame_time=0.1, episodes=1, method='QLearnin
     pacman = loadPacman()
     display = graphicsDisplay.PacmanGraphics(frameTime = frame_time)
 
-    runGames(layout, pacman, ghosts, display, method, episodes, verbose)
+    runGames(layout, pacman, ghosts, display, method, episodes, verbose, multithreaded)

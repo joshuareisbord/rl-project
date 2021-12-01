@@ -20,13 +20,14 @@ class Game:
     The Game manages the control flow, soliciting actions from agents.
     """
 
-    def __init__( self, agents, display, method, rules, episodes, verbose, startingIndex=0):
+    def __init__( self, agents, display, method, rules, episodes, verbose, multithreaded, startingIndex=0):
         self.agentCrashed = False
         self.agents = agents
         self.display = display
         self.rules = rules
         self.verbose = verbose
         self.startingIndex = startingIndex
+        self.multithreaded = multithreaded
         self.gameOver = False
         self.method = method
         self.episodes = episodes
