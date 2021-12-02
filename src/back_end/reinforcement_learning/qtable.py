@@ -82,9 +82,10 @@ class State:
 
 class QTable:
 
-    def __init__(self): # TODO: take actions from Directions class as list as an argument
+    def __init__(self):
         self.table = {}
-        self.actions = ['North', 'East', 'South', 'West'] # TODO: change to a list of actions from Directions class!
+        self.actions = ['North', 'East', 'South', 'West']
+        self.num_actions = len(self.get_actions())
         
 
     def init_table(self):
@@ -98,9 +99,9 @@ class QTable:
                     for w in range(2): # can go west: 1, cant go west: 0
                         for p_dir in range(5): # player direction: 0 = north, 1 = east, 2 = south, 3 = west
                             for g_dir in range(5): # ghost direction: 0 = north, 1 = east, 2 = south, 3 = west
-                                for prox in range(2):
+                                for prox in range(2):   # ghost proximity: 0 = not in proximity, 1 = in proximity
                                     state = State(n, e, s, w, p_dir, g_dir, prox)
-                                    self.table[hash(state)] = [0]*len(self.get_actions()) # create an entry in the Q-table for the state
+                                    self.table[hash(state)] = [0] * self.num_actions  # create an entry in the Q-table for the state
 
     def get_table(self):
         """
@@ -144,23 +145,25 @@ class QTable:
         :param filename: name of the file
         """
         
-        dir = "src/back_end/training/" + filename + ".json"
-        with open(dir, 'w') as f:
+        file = os.getcwd() + "/back_end/q_tables/" + filename + ".json"
+        with open(file, 'w') as f:
             json.dump(self.table, f, indent=4)
+        f.close()
 
     def load(self, filename='q_table'):
         """
         Loads the Q-Table from a file.
         :param filename: name of the file
         """
-        dir = "src/back_end/training/" + filename + ".json" 
-        if os.path.isfile(dir):
-            with open(dir, 'r') as f:
+        file = os.getcwd() + "/back_end/q_tables/" + filename + ".json"
+        if os.path.isfile(file):
+            with open(file, 'r') as f:
                 raw_table = json.load(f)
                 tmp = {}
                 for key in raw_table:
                     tmp[int(key)] = raw_table[key] # make sure key is an integer
                 self.table = tmp
+            f.close()
         else:
             self.init_table()
             self.save()
@@ -171,6 +174,3 @@ class QTable:
             string += str(key) + " : " + str(self.table[key]) + "\n"
         return string
         
-if __name__ == "__main__":
-    q = QTable()
-    print(q)

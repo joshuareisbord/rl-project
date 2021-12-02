@@ -4,30 +4,33 @@ import random
 def rand_argmax(moves, actions):
     """
     Purpose:
-        Function finds the index of the element with the highest value
-        if mulitple values are the highest, it randomly selects one of
-        the elements.
+        Gets the action that has the highest state-action value.
     Args:
-        arr - array object, where elements are comparable
+        moves - state-action values stored in the QTable.
+        actions - the actions for each move value. 
     Returns: 
-        returns the index of the highest 
-    """
-    
-    # find the index of the highest value
-    directions = ['North', 'South', 'East', 'West']
+        The action that has the highest state-action value. If two or more 
+        move values are equal, one of the actions is chosen arbitrarily.
+        If in a terminal state, a random action is returned.
+    """    
     max_val = float('-inf')
     max_elems = []
+    # Loops through each valid action and the respective value from the qtable.
     for val, action in zip(moves, actions):
-        
-        if val > max_val: # if elem is bigger then max value, then replace max value and list
+        # Check if the state-action pair value is better than the max value.
+        if val > max_val:
+            # Update new max value its action.
             max_val = val
             max_elems = [action]
-        elif val == max_val: # if equal to max, append to list of max elements
+        # Check if the state-action pair value is equal to the max.
+        elif val == max_val:
+            # Add action to list of actions that maximize value.
             max_elems.append(action)
-
-    if len(max_elems) == 1: # only one element then it is the max
+    # Only one best action.
+    if len(max_elems) == 1:
         return max_elems[0]
-    
+    # Terminal state, returns a random action.
     if max_elems == []:
-        return  random.choice(directions)
+        return  random.choice(['North', 'East', 'South', 'West'])
+    # Randomly choose one of the best actions found.
     return random.choice(max_elems)

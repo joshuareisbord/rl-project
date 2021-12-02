@@ -1,23 +1,27 @@
 from back_end.reinforcement_learning.qtable import QTable, State
-import random
 from back_end.reinforcement_learning.rand_argmax import rand_argmax
+import random
 
 def epsilonGreedy(qtable: QTable, state: State, actions, epsilon=0.1):
     """
-    epsilon-greedy policy
-
-    :param qtable: Q-table
-    :param state: the current state as a State object
-    :param epsilon: epsilon
-    :return: action
+    Purpose:
+        Gets an action given a state based on a epsilon greedy policy.
+    Args:
+        qtable - the Qtable.
+        state - the current state.
+        actions - list of actions that can be taken in the current state.
+        epsilon - the epsilon value.
+    Returns:
+        A greedy or random action.
     """
-    try:
+    if 'Stop' in actions:
         actions.remove("Stop")
-    except ValueError:
-        pass
-    directions = ['North', 'South', 'East', 'West']
-    moves = qtable.get_state_values(state) # gets the Q-values (moves) for the current state
-    random_prob = random.random() # random number between 0 and 1
+    # Gets the Q-values (moves) for the current state,
+    moves = qtable.get_state_values(state)
+    # Get random number between 0 and 1
+    random_prob = random.random()
+    # The following code is used to keep the index relation of 
+    # actions that can be taken, and the action values in move. 
     action_num = len(actions)
     new_moves = [0] * action_num
     if 'North' in actions:
@@ -36,8 +40,7 @@ def epsilonGreedy(qtable: QTable, state: State, actions, epsilon=0.1):
     if random_prob < epsilon:
         choices = list(zip(moves, actions))
         if choices == []:
-            return random.choice(directions)
+            return random.choice(['North', 'East', 'South', 'West'])
         return random.choice(choices)[1] # get random move [north, east, south, west]
-        
     # greedy move
     return rand_argmax(new_moves, actions)# get greedy move [north, east, south, west]
