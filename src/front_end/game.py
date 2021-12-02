@@ -31,6 +31,7 @@ class Game:
         self.gameOver = False
         self.method = method
         self.episodes = episodes
+        self.episode = 0
         self.moveHistory = []
         self.totalAgentTimes = [0 for agent in agents]
         self.totalAgentTimeWarnings = [0 for agent in agents]

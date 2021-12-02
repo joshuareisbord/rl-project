@@ -29,6 +29,7 @@ class ClassicGameRules:
         game = Game(agents, display, method, self, episodes, verbose, multithreaded)
         game.state = initState
         self.initialState = initState.deepCopy()
+        self.episode = 0
         return game
 
     def process(self, state, game):
@@ -38,18 +39,22 @@ class ClassicGameRules:
         if state.isWin(): self.win(state, game)
         if state.isLose(): self.lose(state, game)
 
+    def round_count(self, game):
+        self.episode += 1
+        return f"({game.episode}/{game.episodes})"
+
     def win( self, state, game ):
         if game.multithreaded: # if this is the only instance, print out the results.
-            print(str(os.getpid()) + " - Pacman emerges victorious! Score: %d" % state.data.score)
+            print(str(os.getpid()) + " - Pacman emerges victorious! Score: %d " % state.data.score + self.round_count(game))
         else:
-            print("Pacman emerges victorious! Score: %d" % state.data.score)
+            print("Pacman emerges victorious! Score: %d " % state.data.score + self.round_count(game))
         game.gameOver = True
 
     def lose( self, state, game ):
         if game.multithreaded: # if this is the only instance, print out the results.
-            print(str(os.getpid()) + " - Pacman died! Score: %d" % state.data.score)
+            print(str(os.getpid()) + " - Pacman died! Score: %d " % state.data.score + self.round_count(game))
         else:
-            print("Pacman died! Score: %d" % state.data.score)
+            print("Pacman died! Score: %d " % state.data.score + self.round_count(game))
         game.gameOver = True
 
     def getProgress(self, game):

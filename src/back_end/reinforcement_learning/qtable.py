@@ -148,6 +148,7 @@ class QTable:
         file = os.getcwd() + "/back_end/q_tables/" + filename + ".json"
         with open(file, 'w') as f:
             json.dump(self.table, f, indent=4)
+        f.close()
 
     def load(self, filename='q_table'):
         """
@@ -162,6 +163,7 @@ class QTable:
                 for key in raw_table:
                     tmp[int(key)] = raw_table[key] # make sure key is an integer
                 self.table = tmp
+            f.close()
         else:
             self.init_table()
             self.save()

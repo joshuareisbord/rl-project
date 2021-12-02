@@ -141,6 +141,7 @@ class RunGame:
                 total_timesteps += 1
                 total_reward += 1
                 episode_reward += 1
+                self.game.episode += 1
 
             self.games.append(self.game)
             q_table.save(filename)
@@ -224,6 +225,7 @@ class RunGame:
                 total_timesteps += 1
                 total_reward += 1
                 episode_reward += 1
+                self.game.episode += 1
             
             self.games.append(self.game)
             q_table.save(filename)
