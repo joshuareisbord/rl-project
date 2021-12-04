@@ -30,6 +30,8 @@ class RunGame:
             self.run_sarsa(episodes=self.game.episodes)
         elif self.game.method == 'QLearning':
             self.run_qlearning(episodes=self.game.episodes)
+        elif self.game.method == 'FollowQ':
+            self.follow_q(episodes = self.game.episodes)
         else:
             print("Invalid method {self.game.method}! Method must be 'SARSA' or 'QLearning'.")
             exit(1)
@@ -154,7 +156,7 @@ class RunGame:
     def run_qlearning(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.05, filename='Qlearning_QTable'):
         """
         Purpose:
-            SARSA Algorithm for controlling Pacman.
+            Q Learning Algorithm for controlling Pacman.
         Args:
             self - class instance.
             episodes - the number of episodes to run.
@@ -191,18 +193,9 @@ class RunGame:
             while not self.game.gameOver:
                 # Get an action given the current state based on epsilon greedy policy.
                 legal_actions = self.game.state.getLegalPacmanActions()
-                action = epsilonGreedy(q_table, state, legal_actions, epsilon)
+                action = epsilonGreedy(q_table, state, legal_actions, 0)
                 # Take action, observe R, S'
                 self.game.moveHistory.append( (0, action) )
-                self.game.state = self.game.state.generateSuccessor( 0, action )
-                state_prime = pacman_agent.get_state_representation(copy.deepcopy(self.game), 6)
-                reward = pacman_agent.get_reward(self.game.state.data)
-                
-                # Get new state action pair value.
-                new_q_s_a = q_table.get_action_value(state, action) + alpha * (reward + gamma * max(q_table.get_state_values(state_prime)) - q_table.get_action_value(state, action))
-                
-                # Update qtable.
-                q_table.update_state(state, action, new_q_s_a)
                 
                 # Change the display
                 self.game.state.data.agentMoved = 0
@@ -218,9 +211,6 @@ class RunGame:
                 # Move the ghost.
                 self.run_ghost(ghost_agents)
                 
-                # S <- S'
-                state = state_prime
-
                 episode_timesteps += 1
                 total_timesteps += 1
                 total_reward += 1
@@ -229,6 +219,73 @@ class RunGame:
             
             self.games.append(self.game)
             q_table.save(filename)
+            # Update data with results. Used to make graphs.
+            self.collect_data(self.game.method, episode, total_timesteps, episode_timesteps, total_reward, episode_reward)
+
+        # close the display when the game terminates.
+        if not self.game.verbose: self.game.display.finish()
+
+    def follow_q(self, episodes, alpha=0.5, gamma=0.9, epsilon=0.05, filename='Qlearning_QTable'):
+        """
+        Purpose:
+            Follows Q Table.
+        Args:
+            self - class instance.
+            episodes - the number of episodes to run.
+            alpha - the alpha value to use.
+            gamma - the gamma value to use.
+            epsilon - the epsilon value to use.
+            filename - the name of the qtable to load/create.
+        Returns:
+            None
+        """
+        
+        print("Running FollowQ")
+        q_table = QTable()
+        q_table.load(filename) # Load QTable
+        # List of starting game states. Used to get information about each game once completed.
+        start_game = [copy.deepcopy(self.game) for _ in range(episodes)]
+        total_timesteps = 0
+        total_reward = 0
+        for episode in range(episodes):
+            episode_timesteps = 0
+            episode_reward = 0
+            self.game = start_game[episode]                                                 # Get starting game object state
+            if not self.game.verbose: self.game.display.initialize(self.game.state.data)    # Initialize the GUI
+            
+            pacman_agent = self.game.agents[0]                  # Get Pacman Agent object
+            ghost_agents = self.game.agents[1:]                 # Get Ghost Agent Objects
+            self.game.numMoves = 0                              # Initialize move counter.
+
+            # Gets the state object to query qtable.
+            while not self.game.gameOver:
+                state = pacman_agent.get_state_representation(copy.deepcopy(self.game), 6)
+                legal_actions = self.game.state.getLegalPacmanActions()
+                action = epsilonGreedy(q_table, state, legal_actions, epsilon)
+                self.game.moveHistory.append( (0, action) )
+                self.game.state = self.game.state.generateSuccessor( 0, action )
+                
+                # Change the display
+                self.game.state.data.agentMoved = 0
+                if not self.game.verbose: self.game.display.update( self.game.state.data )
+                
+                # Allow for game specific conditions (winning, losing, etc.)
+                self.game.rules.process(self.game.state, self.game)
+                self.game.numMoves += 1
+
+                # Check if in win/lose state before moving the ghost.
+                if self.game.gameOver: continue
+
+                # Move the ghost.
+                self.run_ghost(ghost_agents)
+
+                episode_timesteps += 1
+                total_timesteps += 1
+                total_reward += 1
+                episode_reward += 1
+                self.game.episode += 1
+            
+            self.games.append(self.game)
             # Update data with results. Used to make graphs.
             self.collect_data(self.game.method, episode, total_timesteps, episode_timesteps, total_reward, episode_reward)
 
