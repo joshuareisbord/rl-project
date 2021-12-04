@@ -42,7 +42,6 @@ def loadPacman():
 
 def runGames(layout, pacman, ghosts, display, method, episodes, verbose, multithreaded, timeout=30):
 
-    start_time = time.time()
     rules = ClassicGameRules(timeout)
     game = rules.newGame(layout, pacman, ghosts, display, method, episodes, verbose, multithreaded)
     stats = game.run()
@@ -68,6 +67,12 @@ def runGames(layout, pacman, ghosts, display, method, episodes, verbose, multith
         print('Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins]))
 
     directory = str(os.getcwd()) + '/' + 'run_stats/'
+    
+    if method == 'QLearning':
+        directory += 'q_learning/'
+    elif method == 'SARSA':
+        directory += 'sarsa/'
+
     date_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     file_name = f"m{method}-e{episodes}-t{date_time}-stats.json"
     if multithreaded: # dumps stats collected to appropriate .json file

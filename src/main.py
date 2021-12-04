@@ -16,7 +16,9 @@ def error(message):
 if __name__ == "__main__":
 
                    # [layout, episodes, ghosts, frame_time, method, verbose, multithreaded]
-    default_params = ['smallClassicTest2', 10, 1, 0.001, 'QLearning', True, False]
+    # default_params = ['smallClassicTest2', 10, 1, 0.001, 'QLearning', True, False]
+    default_params = ['smallClassicTest2', 5, 1, 0.1, 'FollowQ', False, False]
+
     core_count = 1 # default core ocunt
 
     print("\nParamaters Set:")
@@ -77,13 +79,15 @@ if __name__ == "__main__":
             
             # change td method
             elif to_change == "5":
-                choice = input("Enter TD method (SARSA or QLearning): ")
+                choice = input("Enter TD method (SARSA, QLearning, or FollowQ (just follow QTable)): ")
                 if choice == "SARSA" or choice == "sarsa":
                     default_params[4] = "SARSA"
                 elif choice == "QLearning" or choice == "qlearning":
                     default_params[4] = "QLearning"
+                elif choice == "FollowQ" or choice == "followq":
+                    default_params[4] = "FollowQ"
                 else:
-                    error("Invalid input! Must be 'SARSA' or 'QLearning'!")
+                    error("Invalid input! Must be 'SARSA', 'QLearning', or FollowQ!")
             
             # verbose mode
             elif to_change == "6":
