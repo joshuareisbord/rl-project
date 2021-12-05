@@ -144,8 +144,12 @@ class QTable:
         Saves the Q-Table to a file.
         :param filename: name of the file
         """
-        
-        file = os.getcwd() + "/back_end/q_tables/" + filename + ".json"
+        directory = os.getcwd() + "/back_end/q_tables/"
+        file = directory + filename + ".json"
+
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
         with open(file, 'w') as f:
             json.dump(self.table, f, indent=4)
         f.close()

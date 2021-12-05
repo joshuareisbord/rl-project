@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
                    # [layout, episodes, ghosts, frame_time, method, verbose, multithreaded]
     # default_params = ['smallClassicTest2', 10, 1, 0.001, 'QLearning', True, False]
-    default_params = ['smallClassicTest2', 10, 1, 0.01, 'SARSA', False, False]
+    default_params = ['smallClassicTest2', 2, 1, 0.01, 'SARSA', True, False]
 
     core_count = 1 # default core ocunt
 

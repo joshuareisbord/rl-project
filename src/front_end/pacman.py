@@ -79,6 +79,9 @@ def runGames(layout, pacman, ghosts, display, method, episodes, verbose, multith
         file_name = f"pid{str(os.getpid())}-{file_name}"
 
     file_name = directory + file_name
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
     with open(file_name, 'w') as f:
         json.dump(learning_stats, f, indent=4)
 
