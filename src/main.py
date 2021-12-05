@@ -1,4 +1,5 @@
 import os
+import front_end.pacman as pacman
 from multiprocessing import Process
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -140,10 +141,10 @@ if __name__ == "__main__":
                    --verbose={default_params[5]} \
                    --multithreaded={default_params[6]}"
 
-    for i in range(core_count):
-            p = Process(target=os.system, args=(f"python threaded_executer.py {arg_string}",))
-            p.start()
+    if not default_params[6]: # single threaded version
+        pacman.main(default_params[0], default_params[2], default_params[3], default_params[1], default_params[4], default_params[5], default_params[6])
 
-    # pacman.main(layout='smallClassicTest2', episodes=2, frame_time=0.001, method='QLearning', verbose=True)
-
-
+    else: # multi threaded version
+        for i in range(core_count):
+                p = Process(target=os.system, args=(f"python threaded_executer.py {arg_string}",))
+                p.start()
